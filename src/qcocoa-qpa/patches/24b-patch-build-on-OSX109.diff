@@ -13,7 +13,7 @@ index c5d327c..8864fc2 100644
          [[[window contentView] superview] setNeedsDisplay:YES];
 -        window.titlebarAppearsTransparent = NO;
 +        if (hasTitlebarAppearsTransparent) {
-+            window.titlebarAppearsTransparent = NO;
++            [window setTitlebarAppearsTransparent:NO];
 +        }
          return;
      }
@@ -24,7 +24,7 @@ index c5d327c..8864fc2 100644
      [window setStyleMask:[window styleMask] | NSTexturedBackgroundWindowMask];
 -    window.titlebarAppearsTransparent = YES;
 +    if (hasTitlebarAppearsTransparent) {
-+        window.titlebarAppearsTransparent = YES;
++        [window setTitlebarAppearsTransparent:YES];
 +    }
  
      [window setContentBorderThickness:effectiveTopContentBorderThickness forEdge:NSMaxYEdge];

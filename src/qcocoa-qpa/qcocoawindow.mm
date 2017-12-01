@@ -2256,7 +2256,7 @@ void QCocoaWindow::applyContentBorderThickness(NSWindow *window)
         [window setStyleMask:[window styleMask] & ~NSTexturedBackgroundWindowMask];
         [[[window contentView] superview] setNeedsDisplay:YES];
         if (hasTitlebarAppearsTransparent) {
-            window.titlebarAppearsTransparent = NO;
+            [window setTitlebarAppearsTransparent:NO];
         }
         return;
     }
@@ -2283,7 +2283,7 @@ void QCocoaWindow::applyContentBorderThickness(NSWindow *window)
 
     [window setStyleMask:[window styleMask] | NSTexturedBackgroundWindowMask];
     if (hasTitlebarAppearsTransparent) {
-        window.titlebarAppearsTransparent = YES;
+        [window setTitlebarAppearsTransparent:YES];
     }
 
     [window setContentBorderThickness:effectiveTopContentBorderThickness forEdge:NSMaxYEdge];
