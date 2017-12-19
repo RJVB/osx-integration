@@ -31,6 +31,7 @@
 #include "kdeplatformsystemtrayicon.h"
 #include "platformtheme_logging.h"
 
+#include <qglobal.h>
 #include <QObject>
 #include <QCoreApplication>
 #include <QGuiApplication>
