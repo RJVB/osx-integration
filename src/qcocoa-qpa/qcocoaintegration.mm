@@ -629,8 +629,13 @@ QCocoaServices *QCocoaIntegration::services() const
 
 QVariant QCocoaIntegration::styleHint(StyleHint hint) const
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+    #define FREETYPEGAMMA 1.5
+#else
+    #define FREETYPEGAMMA 0.975
+#endif
     if (hint == QPlatformIntegration::FontSmoothingGamma)
-        return mOptions.testFlag(UseFreeTypeFontEngine)? 0.975 : 2.0;
+        return mOptions.testFlag(UseFreeTypeFontEngine)? FREETYPEGAMMA : 2.0;
 
     return QPlatformIntegration::styleHint(hint);
 }
