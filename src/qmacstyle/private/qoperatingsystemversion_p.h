@@ -53,15 +53,7 @@
 
 #include "qoperatingsystemversion.h"
 
-#ifdef Q_OS_WIN
-#include <qt_windows.h>
-#endif
-
 QT_BEGIN_NAMESPACE
-
-#ifdef Q_OS_WIN
-OSVERSIONINFOEX qWindowsVersionInfo();
-#endif
 
 static inline QOperatingSystemVersion::OSType currentType()
 {

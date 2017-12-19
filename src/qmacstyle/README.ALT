@@ -1,3 +1,10 @@
+20171219 : upstream head (5.9): b0938cb6c1fa29ec2d2a4fb9273e515cd0d6c08e
+ src/corelib/global/qoperatingsystemversion_p.h                                      |   8 --
+patch: patches/19-sync-upstream-171219.diff
+Changes: git log 01c7b474f5ad2c9fcf4b90c71048624070811618..b0938cb6c1fa29ec2d2a4fb9273e515cd0d6c08e src/corelib/global/qoperatingsystemversion_p.h 
+commit f0d226e4c5ddace02640e3b41d392e84dcd2ed02
+    Add a "shim" to allow use of Clang 5's __builtin_available everywhere
+
 20171030 : upstream head (5.9): 01c7b474f5ad2c9fcf4b90c71048624070811618
  src/widgets/styles/qstylehelper.cpp                                        |   1 -
 patch: patches/18-sync-upstream-171030.diff
