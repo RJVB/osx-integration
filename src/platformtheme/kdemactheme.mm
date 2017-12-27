@@ -65,6 +65,7 @@
 // instantiating the native platform theme requires the use of private APIs
 #include <QtGui/private/qguiapplication_p.h>
 #include <QtGui/qpa/qplatformintegration.h>
+#include <QtGui/qpa/qplatformnativeinterface.h>
 
 
 #include <kiconengine.h>
@@ -720,6 +721,22 @@ QPlatformSystemTrayIcon *KdeMacTheme::createPlatformSystemTrayIcon() const
     // TODO: figure out if it makes sense to return something other than 
     // nativeTheme->createPlatformSystemTrayIcon() or even NULL
     return KdePlatformTheme::createPlatformSystemTrayIcon();
+}
+
+QPlatformNativeInterface *KdeMacTheme::nativeInterface()
+{
+    if (!m_nativeInterface) {
+        m_nativeInterface = QGuiApplication::platformNativeInterface();
+    }
+    return m_nativeInterface;
+}
+
+bool KdeMacTheme::hasPlatformFunction(const QByteArray &functionName)
+{
+    if (nativeInterface()) {
+        return m_nativeInterface->nativeResourceFunctionForIntegration(functionName) != nullptr;
+    }
+    return false;
 }
 
 #include "kdemactheme.moc"

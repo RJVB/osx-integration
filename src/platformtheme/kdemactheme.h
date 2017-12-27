@@ -32,6 +32,7 @@
 class KHintsSettingsMac;
 class QIconEngine;
 class KdeMacThemeEventFilter;
+class QPlatformNativeInterface;
 
 class KdeMacTheme : public KdePlatformTheme
 {
@@ -56,6 +57,9 @@ public:
 
     QPlatformSystemTrayIcon *createPlatformSystemTrayIcon() const override;
 
+    QPlatformNativeInterface *nativeInterface();
+    bool hasPlatformFunction(const QByteArray &functionName);
+
     bool verbose;
 
 protected:
@@ -70,6 +74,7 @@ private:
 
     // this will hold an instance of a class with Qt and/or native event filters:
     KdeMacThemeEventFilter *m_eventFilter;
+    QPlatformNativeInterface *m_nativeInterface;
 };
 
 #endif // KDEMACTHEME_H
