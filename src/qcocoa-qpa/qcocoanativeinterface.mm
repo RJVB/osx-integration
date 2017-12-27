@@ -73,6 +73,12 @@
 
 QT_BEGIN_NAMESPACE
 
+static bool supports_qt_mac_use_freetype()
+{
+    return true;
+}
+
+
 QCocoaNativeInterface::QCocoaNativeInterface()
 {
 }
@@ -142,6 +148,10 @@ QPlatformNativeInterface::NativeResourceForIntegrationFunction QCocoaNativeInter
         return NativeResourceForIntegrationFunction(QCocoaNativeInterface::setNSToolbar);
     if (resource.toLower() == "testcontentborderposition")
         return NativeResourceForIntegrationFunction(QCocoaNativeInterface::testContentBorderPosition);
+
+    if (resource.toLower() == "supports_qt_mac_use_freetype") {
+        return NativeResourceForIntegrationFunction(supports_qt_mac_use_freetype);
+    }
 
     return 0;
 }
