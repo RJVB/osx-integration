@@ -23,6 +23,9 @@
 #define KFONTSETTINGSDATAMAC_H
 
 #include "kfontsettingsdata.h"
+#include <QFontDatabase>
+
+class KdeMacTheme;
 
 class KFontSettingsDataMac : public KFontSettingsData
 {
@@ -41,8 +44,10 @@ public:
         FontTypesCount
     };
 
-    KFontSettingsDataMac();
+    KFontSettingsDataMac(KdeMacTheme *theme);
     ~KFontSettingsDataMac();
+
+    const char *fontNameFor(QFontDatabase::SystemFont role) const;
 
 public Q_SLOTS:
     void dropFontSettingsCache();
@@ -53,7 +58,10 @@ protected Q_SLOTS:
 public:
     QFont *font(FontTypes fontType);
 private:
+    KFontSettingsDataMac();
+
     QFont *mFonts[FontTypesCount];
+    KdeMacTheme *mTheme;
 };
 
 #endif // KFONTSETTINGSDATAMAC_H

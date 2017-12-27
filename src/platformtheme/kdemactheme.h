@@ -56,6 +56,8 @@ public:
 
     QPlatformSystemTrayIcon *createPlatformSystemTrayIcon() const override;
 
+    bool verbose;
+
 protected:
     void loadSettings();
     KFontSettingsDataMac::FontTypes fontType(Font type) const;

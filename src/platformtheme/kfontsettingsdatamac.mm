@@ -20,6 +20,7 @@
 */
 
 #include "kfontsettingsdatamac.h"
+#include "kdemactheme.h"
 #include "platformtheme_logging.h"
 
 #include <QDebug>
@@ -62,7 +63,7 @@ KFontData DefaultFontData[KFontSettingsDataMac::FontTypesCount] = {
     { GeneralId, "messageBoxFont",       DefaultFont,       13, QFont::Bold, QFont::SansSerif, "Bold" }
 };
 
-static const char *fontNameFor(QFontDatabase::SystemFont role)
+const char *KFontSettingsDataMac::fontNameFor(QFontDatabase::SystemFont role) const
 {
     QFont qf = QFontDatabase::systemFont(role);
     if (!qf.defaultFamily().isEmpty()) {
@@ -74,7 +75,7 @@ static const char *fontNameFor(QFontDatabase::SystemFont role)
         } else {
             fn = strdup(qf.defaultFamily().toLocal8Bit().data());
         }
-        if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE")) {
+        if (mTheme->verbose) {
             qCWarning(PLATFORMTHEME) << "fontNameFor" << role << "font:" << qf << "name:" << fn;
         }
         return fn;
@@ -83,7 +84,7 @@ static const char *fontNameFor(QFontDatabase::SystemFont role)
     }
 }
 
-void initDefaultFonts()
+void initDefaultFonts(KFontSettingsDataMac *instance)
 {
     const char *fn;
     static bool active = false;
@@ -95,19 +96,19 @@ void initDefaultFonts()
     active = true;
 
     if (!LocalDefaultFont) {
-        fn = fontNameFor(QFontDatabase::GeneralFont);
+        fn = instance->fontNameFor(QFontDatabase::GeneralFont);
         LocalDefaultFont = fn;
     }
     for (int i = 0 ; i < KFontSettingsDataMac::FontTypesCount ; ++i) {
         switch(i) {
             case KFontSettingsDataMac::FixedFont:
-                fn = fontNameFor(QFontDatabase::FixedFont);
+                fn = instance->fontNameFor(QFontDatabase::FixedFont);
                 break;
             case KFontSettingsDataMac::WindowTitleFont:
-                fn = fontNameFor(QFontDatabase::TitleFont);
+                fn = instance->fontNameFor(QFontDatabase::TitleFont);
                 break;
             case KFontSettingsDataMac::SmallestReadableFont:
-                fn = fontNameFor(QFontDatabase::SmallestReadableFont);
+                fn = instance->fontNameFor(QFontDatabase::SmallestReadableFont);
                 break;
             default:
                 fn = LocalDefaultFont;
@@ -129,7 +130,8 @@ void initDefaultFonts()
     active = false;
 }
 
-KFontSettingsDataMac::KFontSettingsDataMac()
+KFontSettingsDataMac::KFontSettingsDataMac(KdeMacTheme *theme)
+    : mTheme(theme)
 {
 #ifdef DBUS_SUPPORT_ENABLED
     QMetaObject::invokeMethod(this, "delayedDBusConnects", Qt::QueuedConnection);
@@ -178,7 +180,7 @@ QFont *KFontSettingsDataMac::font(FontTypes fontType)
             // we prefer to return NULL if called through recursively.
             if (!active) {
                 active = true;
-                initDefaultFonts();
+                initDefaultFonts(this);
                 active = false;
             } else {
                 // our caller must handle NULL, preferably by relaying the font request

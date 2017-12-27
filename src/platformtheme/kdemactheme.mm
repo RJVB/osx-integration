@@ -428,9 +428,10 @@ KdeMacTheme::KdeMacTheme()
     } else {
         nativeTheme = Q_NULLPTR;
     }
+    verbose = qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE");
     if (!nativeTheme) {
         warnNoNativeTheme();
-    } else if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE")) {
+    } else if (verbose) {
         qCWarning(PLATFORMTHEME) << Q_FUNC_INFO
             << "loading platform theme plugin" << QLatin1String(PLATFORM_PLUGIN_THEME_NAME) << "for platform" << platformName;
     }
@@ -540,9 +541,15 @@ QVariant KdeMacTheme::themeHint(QPlatformTheme::ThemeHint hintType) const
 {
     QVariant hint = m_hints->hint(hintType);
     if (hint.isValid()) {
+        if (verbose) {
+            qCWarning(PLATFORMTHEME) << "themeHint" << hintType << ":" << hint;
+        }
         return hint;
     } else {
         if (nativeTheme) {
+            if (verbose) {
+                qCWarning(PLATFORMTHEME) << "Using native theme for themeHint" << hintType << ":" << nativeTheme->themeHint(hintType);
+            }
             return nativeTheme->themeHint(hintType);
         }
         return QPlatformTheme::themeHint(hintType);
@@ -595,10 +602,10 @@ const QFont *KdeMacTheme::font(Font type) const
 void KdeMacTheme::loadSettings()
 {
     if (!m_fontsData) {
-        m_fontsData = new KFontSettingsDataMac;
+        m_fontsData = new KFontSettingsDataMac(this);
     }
     if (!m_hints) {
-        m_hints = new KHintsSettingsMac;
+        m_hints = new KHintsSettingsMac(this);
     }
 }
 
