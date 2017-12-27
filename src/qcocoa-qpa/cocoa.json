@@ -1,3 +1,10 @@
 {
-    "Keys": [ "cocoa" ]
+    "Keys": [ "cocoa" ],
+    "Name": "QAltCocoa",
+    "Copyright": "(C) 2016-17 René J.V. Bertin",
+    "Description": [
+        "Alternative Mac/Cocoa QPA plugin",
+        "Based on the Qt 5.9 Cocoa QPA with extra features and 'backported' to work with Qt 5.8 and on OS X 10.9"
+    ],
+    "Url": [ "https://github.com/RJVB/osx-integration" ]
 }

@@ -327,6 +327,11 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
         qWarning("Creating multiple Cocoa platform integrations is not supported");
     mInstance = this;
 
+#ifndef QT_NO_FREETYPE
+    if (qt_mac_resolveOption(false, "QT_MAC_USE_FREETYPE")) {
+        mOptions |= QCocoaIntegration::UseFreeTypeFontEngine;
+    }
+#endif
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
 #ifndef QT_NO_FREETYPE
     if (mOptions.testFlag(UseFreeTypeFontEngine))
