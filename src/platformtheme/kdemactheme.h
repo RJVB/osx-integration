@@ -58,7 +58,8 @@ public:
     QPlatformSystemTrayIcon *createPlatformSystemTrayIcon() const override;
 
     QPlatformNativeInterface *nativeInterface();
-    bool hasPlatformFunction(const QByteArray &functionName);
+    typedef void * (*PlatformFunctionPtr)();
+    PlatformFunctionPtr platformFunction(const QByteArray &functionName);
 
     bool verbose;
 

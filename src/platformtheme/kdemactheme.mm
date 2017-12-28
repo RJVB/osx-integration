@@ -411,6 +411,8 @@ How we get here:
 ============ */
 
 KdeMacTheme::KdeMacTheme()
+    : m_nativeInterface(nullptr)
+    , verbose(qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE"))
 {
     if (strcasecmp(QT_VERSION_STR, qVersion())) {
         NSLog(@"Warning: the %s platform theme plugin for Mac was built against Qt %s but is running with Qt %s!",
@@ -429,7 +431,6 @@ KdeMacTheme::KdeMacTheme()
     } else {
         nativeTheme = Q_NULLPTR;
     }
-    verbose = qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE");
     if (!nativeTheme) {
         warnNoNativeTheme();
     } else if (verbose) {
@@ -731,12 +732,12 @@ QPlatformNativeInterface *KdeMacTheme::nativeInterface()
     return m_nativeInterface;
 }
 
-bool KdeMacTheme::hasPlatformFunction(const QByteArray &functionName)
+KdeMacTheme::PlatformFunctionPtr KdeMacTheme::platformFunction(const QByteArray &functionName)
 {
     if (nativeInterface()) {
-        return m_nativeInterface->nativeResourceFunctionForIntegration(functionName) != nullptr;
+        return m_nativeInterface->nativeResourceFunctionForIntegration(functionName);
     }
-    return false;
+    return nullptr;
 }
 
 #include "kdemactheme.moc"

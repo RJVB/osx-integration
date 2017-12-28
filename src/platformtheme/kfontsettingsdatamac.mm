@@ -142,6 +142,24 @@ KFontSettingsDataMac::KFontSettingsDataMac(KdeMacTheme *theme)
         // delete mFonts[i];
         mFonts[i] = 0;
     }
+
+    KConfigGroup general(kdeGlobals(), "General");
+    const QString fontEngine = general.readEntry("fontEngine", QString());
+    if (!fontEngine.isEmpty()) {
+        const auto fptr = mTheme->platformFunction("qt_mac_use_freetype");
+        bool useFreeType = fontEngine.compare(QLatin1String("FreeType"), Qt::CaseInsensitive) == 0;
+        bool result = false;
+        if (fptr) {
+            typedef bool (*qt_mac_use_freetype)(bool enabled);
+            result = reinterpret_cast<qt_mac_use_freetype>(fptr)(useFreeType);
+        }
+        if (!result && QGuiApplication::platformName().contains(QLatin1String("cocoa"))) {
+            qCWarning(PLATFORMTHEME) << "Couldn't"
+                << (useFreeType? "enable" : "disable")
+                << "the FreeType fontengine";
+        }
+    }
+
 }
 
 KFontSettingsDataMac::~KFontSettingsDataMac()
