@@ -41,7 +41,9 @@ and also reintroduces a basic fullscreen mode that works consistently across
 Mission Control settings and platforms - i.e. it never blackens out other
 attached monitors but keeps their content visible and accessible. It's also a
 lot faster and supports opening new windows without side-effects when in
-fullscreen mode.
+fullscreen mode. Selecting the FreeType engine has been made easier via an env.
+variable (QT_MAC_USE_FREETYPE) as well as an integration function that can be
+called from application code (see kfontsettingsdatamac.mm).
 This plugin installs next to and will be loaded instead of the stock plugin; it
 will then give priority to the modified QMacStyle if that is installed. If the
 KDE platform theme plugin is built in override mode (see above) this plugin is
