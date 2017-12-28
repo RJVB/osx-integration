@@ -73,9 +73,9 @@
 
 QT_BEGIN_NAMESPACE
 
-static bool supports_qt_mac_use_freetype()
+static bool qt_mac_use_freetype(bool enabled)
 {
-    return true;
+    return QCocoaIntegration::instance()->freeTypeFontEngine(enabled);
 }
 
 
@@ -149,8 +149,8 @@ QPlatformNativeInterface::NativeResourceForIntegrationFunction QCocoaNativeInter
     if (resource.toLower() == "testcontentborderposition")
         return NativeResourceForIntegrationFunction(QCocoaNativeInterface::testContentBorderPosition);
 
-    if (resource.toLower() == "supports_qt_mac_use_freetype") {
-        return NativeResourceForIntegrationFunction(supports_qt_mac_use_freetype);
+    if (resource.toLower() == "qt_mac_use_freetype") {
+        return NativeResourceForIntegrationFunction(qt_mac_use_freetype);
     }
 
     return 0;

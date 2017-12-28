@@ -169,6 +169,8 @@ public:
 
     void beep() const Q_DECL_OVERRIDE;
 
+    bool freeTypeFontEngine(bool enabled);
+    bool mCanReplaceFontDatabase;
 private:
     static QCocoaIntegration *mInstance;
     Options mOptions;

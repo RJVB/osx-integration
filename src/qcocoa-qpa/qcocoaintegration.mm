@@ -322,6 +322,7 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
     , mNativeInterface(new QCocoaNativeInterface)
     , mServices(new QCocoaServices)
     , mKeyboardMapper(new QCocoaKeyMapper)
+    , mCanReplaceFontDatabase(true)
 {
     if (mInstance != 0)
         qWarning("Creating multiple Cocoa platform integrations is not supported");
@@ -577,6 +578,7 @@ QAbstractEventDispatcher *QCocoaIntegration::createEventDispatcher() const
 
 QCoreTextFontDatabase *QCocoaIntegration::fontDatabase() const
 {
+    QCocoaIntegration::instance()->mCanReplaceFontDatabase = false;
     return mFontDb.data();
 }
 
@@ -718,6 +720,34 @@ void QCocoaIntegration::setApplicationIcon(const QIcon &icon) const
 void QCocoaIntegration::beep() const
 {
     NSBeep();
+}
+
+bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
+{
+    if (!mCanReplaceFontDatabase) {
+        return false;
+    }
+#ifndef QT_NO_FREETYPE
+    auto options = mOptions;
+    if (enabled) {
+        options |= QCocoaIntegration::UseFreeTypeFontEngine;
+    } else {
+        options &= ~QCocoaIntegration::UseFreeTypeFontEngine;
+    }
+    if (options != mOptions) {
+        mOptions = options;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+        if (mOptions.testFlag(UseFreeTypeFontEngine))
+            mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QFontEngineFT>);
+        else
+            mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QCoreTextFontEngine>);
+#else
+        mFontDb.reset(new QCoreTextFontDatabase(mOptions.testFlag(UseFreeTypeFontEngine)));
+#endif
+        return true;
+    }
+#endif
+    return false;
 }
 
 QT_END_NAMESPACE
