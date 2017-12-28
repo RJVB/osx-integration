@@ -26,6 +26,7 @@
 #include <QDebug>
 
 #include "kdemactheme.h"
+#include "platformtheme_logging.h"
 
 #include <config-platformtheme.h>
 
@@ -47,6 +48,9 @@ public:
     CocoaPlatformThemePlugin(QObject *parent = Q_NULLPTR)
         : QPlatformThemePlugin(parent)
     {
+        if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_DISABLED")) {
+            qCWarning(PLATFORMTHEME) << "The Cocoa platform theme plugin has been disabled because of QT_QPA_PLATFORMTHEME_DISABLED";
+        }
         if (qEnvironmentVariableIsSet("KDE_LAYOUT_USES_WIDGET_RECT")) {
             qApp->installEventFilter(this);
         }
@@ -56,7 +60,11 @@ public:
     {
         Q_UNUSED(key)
         Q_UNUSED(paramList)
-        return new KdeMacTheme;
+        if (!qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_DISABLED")) {
+            return new KdeMacTheme;
+        } else {
+            return nullptr;
+        }
     }
 protected:
     bool eventFilter(QObject *object, QEvent *event) override
