@@ -424,6 +424,9 @@ KdeMacTheme::KdeMacTheme()
     if (!platformName.contains(QLatin1String("cocoa"))) {
         QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar, true);
         QCoreApplication::setAttribute(Qt::AA_MacDontSwapCtrlAndMeta, true);
+        m_isCocoa = false;
+    } else {
+        m_isCocoa = true;
     }
     QPlatformIntegration *pi = QGuiApplicationPrivate::platformIntegration();
     if (pi) {
@@ -695,11 +698,11 @@ QString KdeMacTheme::standardButtonText(int button) const
 QPlatformDialogHelper *KdeMacTheme::createPlatformDialogHelper(QPlatformTheme::DialogType type) const
 {
 #ifdef KDEMACTHEME_PREFER_NATIVE_DIALOGS
-    // always prefer native dialogs
+    // always prefer native dialogs - when using the Cocoa QPA.
     // NOTE: somehow, the "don't use native dialog" option that Qt's example "standarddialogs"
     // provides does not modify our usePlatformNativeDialog() return value, but *does* cause
     // a Qt dialog to be created instead of the native one. Weird.
-    if (nativeTheme && !qEnvironmentVariableIsSet("PREFER_KDE_DIALOGS")) {
+    if (nativeTheme && m_isCocoa && !qEnvironmentVariableIsSet("PREFER_KDE_DIALOGS")) {
         return nativeTheme->createPlatformDialogHelper(type);
     }
 #endif

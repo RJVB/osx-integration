@@ -23,12 +23,14 @@ and the plugin can now also be built to override the native Cocoa QPA plugin
 (OVERRIDE_NATIVE_THEME CMake option). The Menu key emulation still requires
 a Qt patch (or a dedicated event handler) to do anything useful though.
 
-Other useful env. variables:
-QT_QPA_PLATFORMTHEME_VERBOSE : activate verbose mode (logging category
+* Other useful env. variables:
+- QT_QPA_PLATFORMTHEME_VERBOSE : activate verbose mode (logging category
   CocoaPlatformTheme or KDEPlatformTheme).
-QT_QPA_PLATFORMTHEME_CONFIG_FILE : load a different file instead of "kdeglobals"
+- QT_QPA_PLATFORMTHEME_CONFIG_FILE : load a different file instead of "kdeglobals"
   from ~/.config or ~/Library/Preferences
-QT_QPA_PLATFORMTHEME_DISABLED : disable the plugin completely.
+- QT_QPA_PLATFORMTHEME_DISABLED : disable the plugin completely.
+- PREFER_KDE_DIALOGS : force KDE dialogs even when configured to prefer native
+  file dialogs.
 
 This component should still build against Qt 5.5.x; the other components need at
 least Qt 5.8 .

@@ -77,7 +77,7 @@ QIcon KdePlatformTheme::fileIcon(const QFileInfo &fileInfo, QPlatformTheme::Icon
         return QIcon::fromTheme(QLatin1String("inode-directory"));
     }
 
-    qCWarning(PLATFORMTHEME) << Q_FUNC_INFO
+    qCDebug(PLATFORMTHEME) << Q_FUNC_INFO
         << "file:" << fileInfo.absoluteFilePath()
         << "icon:" << KIO::iconNameForUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
     return QIcon::fromTheme(KIO::iconNameForUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath())));

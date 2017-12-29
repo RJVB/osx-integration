@@ -76,6 +76,8 @@ private:
     // this will hold an instance of a class with Qt and/or native event filters:
     KdeMacThemeEventFilter *m_eventFilter;
     QPlatformNativeInterface *m_nativeInterface;
+
+    bool m_isCocoa;
 };
 
 #endif // KDEMACTHEME_H
