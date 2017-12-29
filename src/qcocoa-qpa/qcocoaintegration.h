@@ -55,7 +55,7 @@
 #include <QtCore/QScopedPointer>
 #include <qpa/qplatformintegration.h>
 
-// #define QT_MAC_USE_FONTCONFIG
+#define QT_MAC_USE_FONTCONFIG
 #ifdef QT_MAC_USE_FONTCONFIG
 #include <QtFontDatabaseSupport/private/qfontconfigdatabase_p.h>
 typedef QFontconfigDatabase QCocoaFontDatabase;
@@ -179,6 +179,11 @@ public:
 
     bool freeTypeFontEngine(bool enabled);
     bool mCanReplaceFontDatabase;
+    bool fontDatabaseIsCoreText() const;
+#ifdef QT_MAC_USE_FONTCONFIG
+    qreal m_fontSmoothingGamma;
+#endif
+
 private:
     static QCocoaIntegration *mInstance;
     Options mOptions;
@@ -201,10 +206,6 @@ private:
 
     QHash<QWindow *, NSToolbar *> mToolbars;
     QList<QCocoaWindow *> m_popupWindowStack;
-
-#ifdef QT_MAC_USE_FONTCONFIG
-    qreal m_fontSmoothingGamma;
-#endif
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QCocoaIntegration::Options)

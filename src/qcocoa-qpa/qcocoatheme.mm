@@ -190,11 +190,14 @@ const QPalette *QCocoaTheme::palette(Palette type) const
 
 QHash<QPlatformTheme::Font, QFont *> qt_mac_createRoleFonts()
 {
-#ifndef QT_MAC_USE_FONTCONFIG
-    QCoreTextFontDatabase *ctfd = static_cast<QCoreTextFontDatabase *>(QGuiApplicationPrivate::platformIntegration()->fontDatabase());
-#else
-    static QCoreTextFontDatabase *ctfd = new QCoreTextFontDatabase;
-#endif
+    static QCoreTextFontDatabase *ctfd = NULL;
+    if (!ctfd) {
+        if (QCocoaIntegration::instance()->fontDatabaseIsCoreText()) {
+            ctfd = static_cast<QCoreTextFontDatabase *>(QGuiApplicationPrivate::platformIntegration()->fontDatabase());
+        } else {
+            ctfd = new QCoreTextFontDatabase;
+        }
+    }
     return ctfd->themeFonts();
 }
 

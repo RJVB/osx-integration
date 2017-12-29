@@ -768,4 +768,13 @@ bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
     return false;
 }
 
+bool QCocoaIntegration::fontDatabaseIsCoreText() const
+{
+#ifdef QT_MAC_USE_FONTCONFIG
+    return false;
+#else
+    return true;
+#endif
+}
+
 QT_END_NAMESPACE
