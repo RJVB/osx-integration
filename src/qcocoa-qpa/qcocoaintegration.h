@@ -54,7 +54,15 @@
 
 #include <QtCore/QScopedPointer>
 #include <qpa/qplatformintegration.h>
+
+// #define QT_MAC_USE_FONTCONFIG
+#ifdef QT_MAC_USE_FONTCONFIG
+#include <QtFontDatabaseSupport/private/qfontconfigdatabase_p.h>
+typedef QFontconfigDatabase QCocoaFontDatabase;
+#else
 #include <QtFontDatabaseSupport/private/qcoretextfontdatabase_p.h>
+typedef QCoreTextFontDatabase QCocoaFontDatabase;
+#endif
 
 QT_BEGIN_NAMESPACE
 
@@ -134,7 +142,7 @@ public:
 
     QAbstractEventDispatcher *createEventDispatcher() const Q_DECL_OVERRIDE;
 
-    QCoreTextFontDatabase *fontDatabase() const Q_DECL_OVERRIDE;
+    QPlatformFontDatabase *fontDatabase() const Q_DECL_OVERRIDE;
     QCocoaNativeInterface *nativeInterface() const Q_DECL_OVERRIDE;
     QPlatformInputContext *inputContext() const Q_DECL_OVERRIDE;
 #ifndef QT_NO_ACCESSIBILITY
@@ -175,7 +183,7 @@ private:
     static QCocoaIntegration *mInstance;
     Options mOptions;
 
-    QScopedPointer<QCoreTextFontDatabase> mFontDb;
+    QScopedPointer<QPlatformFontDatabase> mFontDb;
 
     QScopedPointer<QPlatformInputContext> mInputContext;
 #ifndef QT_NO_ACCESSIBILITY
@@ -193,6 +201,10 @@ private:
 
     QHash<QWindow *, NSToolbar *> mToolbars;
     QList<QCocoaWindow *> m_popupWindowStack;
+
+#ifdef QT_MAC_USE_FONTCONFIG
+    qreal m_fontSmoothingGamma;
+#endif
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QCocoaIntegration::Options)

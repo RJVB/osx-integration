@@ -333,6 +333,7 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
         mOptions |= QCocoaIntegration::UseFreeTypeFontEngine;
     }
 #endif
+#ifndef QT_MAC_USE_FONTCONFIG
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
 #ifndef QT_NO_FREETYPE
     if (mOptions.testFlag(UseFreeTypeFontEngine))
@@ -342,6 +343,17 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
         mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QCoreTextFontEngine>);
 #else
     mFontDb.reset(new QCoreTextFontDatabase(mOptions.testFlag(UseFreeTypeFontEngine)));
+#endif
+#else
+    mFontDb.reset(new QCocoaFontDatabase);
+    m_fontSmoothingGamma = 0.9;
+    if (qEnvironmentVariableIsSet("QT_MAC_FONT_GAMMA")) {
+        bool ok = false;
+        qreal fontgamma = qgetenv("QT_MAC_FONT_GAMMA").toDouble(&ok);
+        if (ok) {
+            m_fontSmoothingGamma = fontgamma;
+        }
+    }
 #endif
 
     QString icStr = QPlatformInputContextFactory::requested();
@@ -576,7 +588,7 @@ QAbstractEventDispatcher *QCocoaIntegration::createEventDispatcher() const
     return new QCocoaEventDispatcher;
 }
 
-QCoreTextFontDatabase *QCocoaIntegration::fontDatabase() const
+QPlatformFontDatabase *QCocoaIntegration::fontDatabase() const
 {
     QCocoaIntegration::instance()->mCanReplaceFontDatabase = false;
     return mFontDb.data();
@@ -642,7 +654,11 @@ QVariant QCocoaIntegration::styleHint(StyleHint hint) const
     #define FREETYPEGAMMA 0.975
 #endif
     if (hint == QPlatformIntegration::FontSmoothingGamma)
+#ifdef QT_MAC_USE_FONTCONFIG
+        return m_fontSmoothingGamma;
+#else
         return mOptions.testFlag(UseFreeTypeFontEngine)? FREETYPEGAMMA : 2.0;
+#endif
 
     return QPlatformIntegration::styleHint(hint);
 }
@@ -724,6 +740,7 @@ void QCocoaIntegration::beep() const
 
 bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
 {
+#ifndef QT_MAC_USE_FONTCONFIG
     if (!mCanReplaceFontDatabase) {
         return false;
     }
@@ -747,6 +764,7 @@ bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
         return true;
     }
 #endif
+#endif //FONTCONFIG
     return false;
 }
 

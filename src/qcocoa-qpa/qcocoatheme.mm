@@ -50,6 +50,7 @@
 #include "qcocoamenu.h"
 #include "qcocoamenubar.h"
 #include "qcocoahelpers.h"
+#include "qcocoaintegration.h"
 
 #include <QtCore/qfileinfo.h>
 #include <QtGui/private/qguiapplication_p.h>
@@ -189,7 +190,11 @@ const QPalette *QCocoaTheme::palette(Palette type) const
 
 QHash<QPlatformTheme::Font, QFont *> qt_mac_createRoleFonts()
 {
+#ifndef QT_MAC_USE_FONTCONFIG
     QCoreTextFontDatabase *ctfd = static_cast<QCoreTextFontDatabase *>(QGuiApplicationPrivate::platformIntegration()->fontDatabase());
+#else
+    static QCoreTextFontDatabase *ctfd = new QCoreTextFontDatabase;
+#endif
     return ctfd->themeFonts();
 }
 
