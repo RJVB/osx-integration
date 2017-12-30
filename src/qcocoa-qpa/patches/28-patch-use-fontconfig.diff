@@ -1,7 +1,7 @@
-diff --git a/src/qcocoa-qpa/qcocoaintegration.h b/src/qcocoa-qpa/qcocoaintegration.h
+diff --git a/cocoa/qcocoaintegration.h b/cocoa/qcocoaintegration.h
 index 11a1038..87d240c 100644
---- a/src/qcocoa-qpa/qcocoaintegration.h
-+++ b/src/qcocoa-qpa/qcocoaintegration.h
+--- a/cocoa/qcocoaintegration.h
++++ b/cocoa/qcocoaintegration.h
 @@ -54,6 +54,10 @@
  
  #include <QtCore/QScopedPointer>
@@ -49,10 +49,10 @@ index 11a1038..87d240c 100644
  
      QScopedPointer<QPlatformInputContext> mInputContext;
  #ifndef QT_NO_ACCESSIBILITY
-diff --git a/src/qcocoa-qpa/qcocoaintegration.mm b/src/qcocoa-qpa/qcocoaintegration.mm
-index ecf54b4..db9d19a 100644
---- a/src/qcocoa-qpa/qcocoaintegration.mm
-+++ b/src/qcocoa-qpa/qcocoaintegration.mm
+diff --git a/cocoa/qcocoaintegration.mm b/cocoa/qcocoaintegration.mm
+index ecf54b4..65dc3df 100644
+--- a/cocoa/qcocoaintegration.mm
++++ b/cocoa/qcocoaintegration.mm
 @@ -300,6 +300,13 @@ static QCocoaIntegration::Options parseOptions(const QStringList &paramList)
  #ifndef QT_NO_FREETYPE
          if (param == QLatin1String("fontengine=freetype"))
@@ -67,7 +67,7 @@ index ecf54b4..db9d19a 100644
          else
  #endif
              qWarning() << "Unknown option" << param;
-@@ -332,17 +339,47 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
+@@ -332,17 +339,51 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
      if (qt_mac_resolveOption(false, "QT_MAC_USE_FREETYPE")) {
          mOptions |= QCocoaIntegration::UseFreeTypeFontEngine;
      }
@@ -87,11 +87,16 @@ index ecf54b4..db9d19a 100644
 -    if (mOptions.testFlag(UseFreeTypeFontEngine))
 -        mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QFontEngineFT>);
 -    else
++#ifdef HAVE_INFINALITY
 +    m_fontSmoothingGamma = mOptions.testFlag(UseFontConfigDatabase) ? 0.9 : 1.5;
 +#else
-+    m_fontSmoothingGamma = 0.975
++    m_fontSmoothingGamma = 1.5;
  #endif
 -        mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QCoreTextFontEngine>);
+ #else
+-    mFontDb.reset(new QCoreTextFontDatabase(mOptions.testFlag(UseFreeTypeFontEngine)));
++    m_fontSmoothingGamma = 0.975
+ #endif
 +    if (qEnvironmentVariableIsSet("QT_MAC_FREETYPE_FONT_GAMMA")) {
 +        bool ok = false;
 +        qreal fontgamma = qgetenv("QT_MAC_FREETYPE_FONT_GAMMA").toDouble(&ok);
@@ -109,10 +114,9 @@ index ecf54b4..db9d19a 100644
 +        else
 +# endif
 +            mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QCoreTextFontEngine>);
- #else
--    mFontDb.reset(new QCoreTextFontDatabase(mOptions.testFlag(UseFreeTypeFontEngine)));
++#else
 +        mFontDb.reset(new QCoreTextFontDatabase(mOptions.testFlag(UseFreeTypeFontEngine)));
- #endif
++#endif
 +    } else {
 +#if QT_CONFIG(fontconfig)
 +        mFontDb.reset(new QFontconfigDatabase);
@@ -121,7 +125,7 @@ index ecf54b4..db9d19a 100644
  
      QString icStr = QPlatformInputContextFactory::requested();
      icStr.isNull() ? mInputContext.reset(new QCocoaInputContext)
-@@ -576,7 +613,7 @@ QAbstractEventDispatcher *QCocoaIntegration::createEventDispatcher() const
+@@ -576,7 +617,7 @@ QAbstractEventDispatcher *QCocoaIntegration::createEventDispatcher() const
      return new QCocoaEventDispatcher;
  }
  
@@ -130,7 +134,7 @@ index ecf54b4..db9d19a 100644
  {
      QCocoaIntegration::instance()->mCanReplaceFontDatabase = false;
      return mFontDb.data();
-@@ -636,13 +673,12 @@ QCocoaServices *QCocoaIntegration::services() const
+@@ -636,13 +677,12 @@ QCocoaServices *QCocoaIntegration::services() const
  
  QVariant QCocoaIntegration::styleHint(StyleHint hint) const
  {
@@ -148,7 +152,7 @@ index ecf54b4..db9d19a 100644
  
      return QPlatformIntegration::styleHint(hint);
  }
-@@ -724,6 +760,10 @@ void QCocoaIntegration::beep() const
+@@ -724,6 +764,10 @@ void QCocoaIntegration::beep() const
  
  bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
  {
@@ -159,7 +163,7 @@ index ecf54b4..db9d19a 100644
      if (!mCanReplaceFontDatabase) {
          return false;
      }
-@@ -733,6 +773,8 @@ bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
+@@ -733,6 +777,8 @@ bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
          options |= QCocoaIntegration::UseFreeTypeFontEngine;
      } else {
          options &= ~QCocoaIntegration::UseFreeTypeFontEngine;
@@ -168,12 +172,12 @@ index ecf54b4..db9d19a 100644
      }
      if (options != mOptions) {
          mOptions = options;
-@@ -746,8 +788,38 @@ bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
+@@ -746,8 +792,49 @@ bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
  #endif
          return true;
      }
 +    return false;
- #endif
++#endif
 +}
 +
 +bool QCocoaIntegration::fontConfigFontEngine(bool enabled)
@@ -184,6 +188,17 @@ index ecf54b4..db9d19a 100644
 +    }
 +    auto options = mOptions;
 +    bool ret = false;
++#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
++    // unfortunately we may need to reset m_fontSmoothingGamma on 5.9 and up
++    // depending on whether we're configured for use with the Infinality patch set.
++    if (!qEnvironmentVariableIsSet("QT_MAC_FREETYPE_FONT_GAMMA")) {
++#ifdef HAVE_INFINALITY
++        m_fontSmoothingGamma = enabled ? 0.9 : 1.5;
++#else
++        m_fontSmoothingGamma = 1.5;
++#endif
++    }
+ #endif
 +    if (enabled) {
 +        options |= QCocoaIntegration::UseFreeTypeFontEngine | QCocoaIntegration::UseFontConfigDatabase;
 +        if (options != mOptions) {
@@ -207,10 +222,10 @@ index ecf54b4..db9d19a 100644
  }
  
  QT_END_NAMESPACE
-diff --git a/src/qcocoa-qpa/qcocoanativeinterface.mm b/src/qcocoa-qpa/qcocoanativeinterface.mm
+diff --git a/cocoa/qcocoanativeinterface.mm b/cocoa/qcocoanativeinterface.mm
 index 612b9e4..3191b38 100644
---- a/src/qcocoa-qpa/qcocoanativeinterface.mm
-+++ b/src/qcocoa-qpa/qcocoanativeinterface.mm
+--- a/cocoa/qcocoanativeinterface.mm
++++ b/cocoa/qcocoanativeinterface.mm
 @@ -78,6 +78,11 @@ static bool qt_mac_use_freetype(bool enabled)
      return QCocoaIntegration::instance()->freeTypeFontEngine(enabled);
  }
@@ -233,10 +248,10 @@ index 612b9e4..3191b38 100644
  
      return 0;
  }
-diff --git a/src/qcocoa-qpa/qcocoatheme.mm b/src/qcocoa-qpa/qcocoatheme.mm
+diff --git a/cocoa/qcocoatheme.mm b/cocoa/qcocoatheme.mm
 index 4212801..ec48be2 100644
---- a/src/qcocoa-qpa/qcocoatheme.mm
-+++ b/src/qcocoa-qpa/qcocoatheme.mm
+--- a/cocoa/qcocoatheme.mm
++++ b/cocoa/qcocoatheme.mm
 @@ -50,6 +50,7 @@
  #include "qcocoamenu.h"
  #include "qcocoamenubar.h"

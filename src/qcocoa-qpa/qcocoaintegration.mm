@@ -351,7 +351,11 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
     }
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+#ifdef HAVE_INFINALITY
     m_fontSmoothingGamma = mOptions.testFlag(UseFontConfigDatabase) ? 0.9 : 1.5;
+#else
+    m_fontSmoothingGamma = 1.5;
+#endif
 #else
     m_fontSmoothingGamma = 0.975
 #endif
@@ -800,6 +804,17 @@ bool QCocoaIntegration::fontConfigFontEngine(bool enabled)
     }
     auto options = mOptions;
     bool ret = false;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+    // unfortunately we may need to reset m_fontSmoothingGamma on 5.9 and up
+    // depending on whether we're configured for use with the Infinality patch set.
+    if (!qEnvironmentVariableIsSet("QT_MAC_FREETYPE_FONT_GAMMA")) {
+#ifdef HAVE_INFINALITY
+        m_fontSmoothingGamma = enabled ? 0.9 : 1.5;
+#else
+        m_fontSmoothingGamma = 1.5;
+#endif
+    }
+#endif
     if (enabled) {
         options |= QCocoaIntegration::UseFreeTypeFontEngine | QCocoaIntegration::UseFontConfigDatabase;
         if (options != mOptions) {
