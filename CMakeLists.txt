@@ -28,6 +28,10 @@ option(EMULATE_MENU_KEY
         "Emulate the presence of a Menu key as on PC keyboards when the right Command+Option keys are pressed.
         BUILD_QT_PLUGINS must be set for this to have any effect."
         OFF)
+option(HAVE_INFINALITY
+        "The Infinality+Ultimate patch set has been applied to FreeType and FontConfig.
+        (the FontConfig patches are determining). See https://github.com/archfan/infinality_bundle"
+        OFF)
 
 option(USE_PLCRASHREPORTER
         "Use the Plausible CrashReporter (https://www.plcrashreporter.org)"
