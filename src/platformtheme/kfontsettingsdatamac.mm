@@ -145,18 +145,35 @@ KFontSettingsDataMac::KFontSettingsDataMac(KdeMacTheme *theme)
 
     KConfigGroup general(kdeGlobals(), "General");
     const QString fontEngine = general.readEntry("fontEngine", QString());
-    if (!fontEngine.isEmpty()) {
-        const auto fptr = mTheme->platformFunction("qt_mac_use_freetype");
+    if (!fontEngine.isEmpty() && QGuiApplication::platformName().contains(QLatin1String("cocoa"))) {
+        const auto ftptr = mTheme->platformFunction("qt_mac_use_freetype");
+        const auto fcptr = mTheme->platformFunction("qt_mac_use_fontconfig");
         bool useFreeType = fontEngine.compare(QLatin1String("FreeType"), Qt::CaseInsensitive) == 0;
+        bool useFontConfig = fontEngine.compare(QLatin1String("FontConfig"), Qt::CaseInsensitive) == 0;
+        // fontEngine=CoreText is the default and only handled so we can warn appropriately
+        // when the user tries to activate another, unknown font engine.
+        bool useCoreText = fontEngine.compare(QLatin1String("CoreText"), Qt::CaseInsensitive) == 0;
         bool result = false;
-        if (fptr) {
-            typedef bool (*qt_mac_use_freetype)(bool enabled);
-            result = reinterpret_cast<qt_mac_use_freetype>(fptr)(useFreeType);
+        typedef bool (*fontengineEnabler)(bool enabled);
+        if (useFontConfig) {
+            if (fcptr) {
+                result = reinterpret_cast<fontengineEnabler>(fcptr)(useFontConfig);
+            } else {
+                qCWarning(PLATFORMTHEME) << "Cannot use the FontConfig fontengine/fontdatabase:\n"
+                    "\tthis probably means Qt was built without FontConfig support or\n"
+                    "\tthat you're not using the QAltCocoa QPA plugin.";
+            }
+        } else if (ftptr) {
+            result = reinterpret_cast<fontengineEnabler>(ftptr)(useFreeType);
+        } else {
+            qCWarning(PLATFORMTHEME) << "Cannot use the FreeType fontdatabase:\n"
+                "\tthis probably means Qt was built without FreeType support or\n"
+                "\tthat you're not using the QAltCocoa QPA plugin.";
         }
-        if (!result && QGuiApplication::platformName().contains(QLatin1String("cocoa"))) {
+        if (!result) {
             qCWarning(PLATFORMTHEME) << "Couldn't"
-                << (useFreeType? "enable" : "disable")
-                << "the FreeType fontengine";
+                << (useFreeType || useFontConfig || !useCoreText? "enable" : "disable")
+                << "the" << fontEngine << "fontengine";
         }
     }
 
