@@ -190,15 +190,13 @@ const QPalette *QCocoaTheme::palette(Palette type) const
 
 QHash<QPlatformTheme::Font, QFont *> qt_mac_createRoleFonts()
 {
-    static QCoreTextFontDatabase *ctfd = NULL;
-    if (!ctfd) {
-        if (QCocoaIntegration::instance()->fontDatabaseIsCoreText()) {
-            ctfd = static_cast<QCoreTextFontDatabase *>(QGuiApplicationPrivate::platformIntegration()->fontDatabase());
-        } else {
-            ctfd = new QCoreTextFontDatabase;
-        }
+    QPlatformFontDatabase *db = QGuiApplicationPrivate::platformIntegration()->fontDatabase();
+    if (!dynamic_cast<QCoreTextFontDatabase *>(db)) {
+        // ctfd must point to a QFontconfigDatabase instance; create a temp QCoreTextFontDatabase
+        // (no need to cache things here, we're called once only)
+        return QCoreTextFontDatabase().themeFonts();
     }
-    return ctfd->themeFonts();
+    return static_cast<QCoreTextFontDatabase *>(db)->themeFonts();
 }
 
 const QFont *QCocoaTheme::font(Font type) const

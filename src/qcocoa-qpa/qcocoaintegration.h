@@ -55,14 +55,10 @@
 #include <QtCore/QScopedPointer>
 #include <qpa/qplatformintegration.h>
 
-#define QT_MAC_USE_FONTCONFIG
-#ifdef QT_MAC_USE_FONTCONFIG
+#if QT_CONFIG(fontconfig)
 #include <QtFontDatabaseSupport/private/qfontconfigdatabase_p.h>
-typedef QFontconfigDatabase QCocoaFontDatabase;
-#else
-#include <QtFontDatabaseSupport/private/qcoretextfontdatabase_p.h>
-typedef QCoreTextFontDatabase QCocoaFontDatabase;
 #endif
+#include <QtFontDatabaseSupport/private/qcoretextfontdatabase_p.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -122,7 +118,8 @@ class QCocoaIntegration : public QPlatformIntegration
 {
 public:
     enum Option {
-        UseFreeTypeFontEngine = 0x1
+        UseFreeTypeFontEngine = 0x1,
+        UseFontConfigDatabase = 0x2
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -178,11 +175,9 @@ public:
     void beep() const Q_DECL_OVERRIDE;
 
     bool freeTypeFontEngine(bool enabled);
+    bool fontConfigFontEngine(bool enabled);
     bool mCanReplaceFontDatabase;
-    bool fontDatabaseIsCoreText() const;
-#ifdef QT_MAC_USE_FONTCONFIG
     qreal m_fontSmoothingGamma;
-#endif
 
 private:
     static QCocoaIntegration *mInstance;

@@ -78,6 +78,11 @@ static bool qt_mac_use_freetype(bool enabled)
     return QCocoaIntegration::instance()->freeTypeFontEngine(enabled);
 }
 
+static bool qt_mac_use_fontconfig(bool enabled)
+{
+    return QCocoaIntegration::instance()->fontConfigFontEngine(enabled);
+}
+
 
 QCocoaNativeInterface::QCocoaNativeInterface()
 {
@@ -151,6 +156,9 @@ QPlatformNativeInterface::NativeResourceForIntegrationFunction QCocoaNativeInter
 
     if (resource.toLower() == "qt_mac_use_freetype") {
         return NativeResourceForIntegrationFunction(qt_mac_use_freetype);
+    }
+    if (resource.toLower() == "qt_mac_use_fontconfig") {
+        return NativeResourceForIntegrationFunction(qt_mac_use_fontconfig);
     }
 
     return 0;

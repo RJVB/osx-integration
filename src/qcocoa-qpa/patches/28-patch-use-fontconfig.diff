@@ -1,0 +1,263 @@
+diff --git a/src/qcocoa-qpa/qcocoaintegration.h b/src/qcocoa-qpa/qcocoaintegration.h
+index 11a1038..87d240c 100644
+--- a/src/qcocoa-qpa/qcocoaintegration.h
++++ b/src/qcocoa-qpa/qcocoaintegration.h
+@@ -54,6 +54,10 @@
+ 
+ #include <QtCore/QScopedPointer>
+ #include <qpa/qplatformintegration.h>
++
++#if QT_CONFIG(fontconfig)
++#include <QtFontDatabaseSupport/private/qfontconfigdatabase_p.h>
++#endif
+ #include <QtFontDatabaseSupport/private/qcoretextfontdatabase_p.h>
+ 
+ QT_BEGIN_NAMESPACE
+@@ -114,7 +118,8 @@ class QCocoaIntegration : public QPlatformIntegration
+ {
+ public:
+     enum Option {
+-        UseFreeTypeFontEngine = 0x1
++        UseFreeTypeFontEngine = 0x1,
++        UseFontConfigDatabase = 0x2
+     };
+     Q_DECLARE_FLAGS(Options, Option)
+ 
+@@ -134,7 +139,7 @@ public:
+ 
+     QAbstractEventDispatcher *createEventDispatcher() const Q_DECL_OVERRIDE;
+ 
+-    QCoreTextFontDatabase *fontDatabase() const Q_DECL_OVERRIDE;
++    QPlatformFontDatabase *fontDatabase() const Q_DECL_OVERRIDE;
+     QCocoaNativeInterface *nativeInterface() const Q_DECL_OVERRIDE;
+     QPlatformInputContext *inputContext() const Q_DECL_OVERRIDE;
+ #ifndef QT_NO_ACCESSIBILITY
+@@ -170,12 +175,15 @@ public:
+     void beep() const Q_DECL_OVERRIDE;
+ 
+     bool freeTypeFontEngine(bool enabled);
++    bool fontConfigFontEngine(bool enabled);
+     bool mCanReplaceFontDatabase;
++    qreal m_fontSmoothingGamma;
++
+ private:
+     static QCocoaIntegration *mInstance;
+     Options mOptions;
+ 
+-    QScopedPointer<QCoreTextFontDatabase> mFontDb;
++    QScopedPointer<QPlatformFontDatabase> mFontDb;
+ 
+     QScopedPointer<QPlatformInputContext> mInputContext;
+ #ifndef QT_NO_ACCESSIBILITY
+diff --git a/src/qcocoa-qpa/qcocoaintegration.mm b/src/qcocoa-qpa/qcocoaintegration.mm
+index ecf54b4..db9d19a 100644
+--- a/src/qcocoa-qpa/qcocoaintegration.mm
++++ b/src/qcocoa-qpa/qcocoaintegration.mm
+@@ -300,6 +300,13 @@ static QCocoaIntegration::Options parseOptions(const QStringList &paramList)
+ #ifndef QT_NO_FREETYPE
+         if (param == QLatin1String("fontengine=freetype"))
+             options |= QCocoaIntegration::UseFreeTypeFontEngine;
++#if QT_CONFIG(fontconfig)
++        // "fontconfig" is actually a font database instead of a font engine,
++        // but let's present it as a fontengine to the user, for the sake of
++        // consistency and simplicity.
++        else if (param == QLatin1String("fontengine=fontconfig"))
++            options |= QCocoaIntegration::UseFontConfigDatabase;
++#endif
+         else
+ #endif
+             qWarning() << "Unknown option" << param;
+@@ -332,17 +339,47 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
+     if (qt_mac_resolveOption(false, "QT_MAC_USE_FREETYPE")) {
+         mOptions |= QCocoaIntegration::UseFreeTypeFontEngine;
+     }
++# if QT_CONFIG(fontconfig)
++    if (qt_mac_resolveOption(false, "QT_MAC_USE_FONTCONFIG")) {
++        mOptions |= QCocoaIntegration::UseFontConfigDatabase;
++    }
++# endif
+ #endif
++    if (mOptions.testFlag(UseFontConfigDatabase)) {
++        // has to be:
++        mOptions |= QCocoaIntegration::UseFreeTypeFontEngine;
++    }
++
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+-#ifndef QT_NO_FREETYPE
+-    if (mOptions.testFlag(UseFreeTypeFontEngine))
+-        mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QFontEngineFT>);
+-    else
++    m_fontSmoothingGamma = mOptions.testFlag(UseFontConfigDatabase) ? 0.9 : 1.5;
++#else
++    m_fontSmoothingGamma = 0.975
+ #endif
+-        mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QCoreTextFontEngine>);
++    if (qEnvironmentVariableIsSet("QT_MAC_FREETYPE_FONT_GAMMA")) {
++        bool ok = false;
++        qreal fontgamma = qgetenv("QT_MAC_FREETYPE_FONT_GAMMA").toDouble(&ok);
++        if (ok) {
++            m_fontSmoothingGamma = fontgamma;
++        }
++    }
++    // UseFontConfigDatabase can only be set when !QT_NO_FREETYPE and QT_CONFIG(fontconfig)
++    // IOW, we can test it safely without any compile-time conditionals.
++    if (!mOptions.testFlag(UseFontConfigDatabase)) {
++#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
++# ifndef QT_NO_FREETYPE
++        if (mOptions.testFlag(UseFreeTypeFontEngine))
++            mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QFontEngineFT>);
++        else
++# endif
++            mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QCoreTextFontEngine>);
+ #else
+-    mFontDb.reset(new QCoreTextFontDatabase(mOptions.testFlag(UseFreeTypeFontEngine)));
++        mFontDb.reset(new QCoreTextFontDatabase(mOptions.testFlag(UseFreeTypeFontEngine)));
+ #endif
++    } else {
++#if QT_CONFIG(fontconfig)
++        mFontDb.reset(new QFontconfigDatabase);
++#endif
++    }
+ 
+     QString icStr = QPlatformInputContextFactory::requested();
+     icStr.isNull() ? mInputContext.reset(new QCocoaInputContext)
+@@ -576,7 +613,7 @@ QAbstractEventDispatcher *QCocoaIntegration::createEventDispatcher() const
+     return new QCocoaEventDispatcher;
+ }
+ 
+-QCoreTextFontDatabase *QCocoaIntegration::fontDatabase() const
++QPlatformFontDatabase *QCocoaIntegration::fontDatabase() const
+ {
+     QCocoaIntegration::instance()->mCanReplaceFontDatabase = false;
+     return mFontDb.data();
+@@ -636,13 +673,12 @@ QCocoaServices *QCocoaIntegration::services() const
+ 
+ QVariant QCocoaIntegration::styleHint(StyleHint hint) const
+ {
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+-    #define FREETYPEGAMMA 1.5
++    if (hint == QPlatformIntegration::FontSmoothingGamma)
++#ifdef QT_MAC_USE_FONTCONFIG
++        return m_fontSmoothingGamma;
+ #else
+-    #define FREETYPEGAMMA 0.975
++        return mOptions.testFlag(UseFreeTypeFontEngine)? m_fontSmoothingGamma : 2.0;
+ #endif
+-    if (hint == QPlatformIntegration::FontSmoothingGamma)
+-        return mOptions.testFlag(UseFreeTypeFontEngine)? FREETYPEGAMMA : 2.0;
+ 
+     return QPlatformIntegration::styleHint(hint);
+ }
+@@ -724,6 +760,10 @@ void QCocoaIntegration::beep() const
+ 
+ bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
+ {
++    if (mOptions.testFlag(UseFontConfigDatabase)) {
++        // can't be any other way
++        return true;
++    }
+     if (!mCanReplaceFontDatabase) {
+         return false;
+     }
+@@ -733,6 +773,8 @@ bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
+         options |= QCocoaIntegration::UseFreeTypeFontEngine;
+     } else {
+         options &= ~QCocoaIntegration::UseFreeTypeFontEngine;
++        // FontConfig can no longer be used either.
++        options &= ~QCocoaIntegration::UseFontConfigDatabase;
+     }
+     if (options != mOptions) {
+         mOptions = options;
+@@ -746,8 +788,38 @@ bool QCocoaIntegration::freeTypeFontEngine(bool enabled)
+ #endif
+         return true;
+     }
++    return false;
+ #endif
++}
++
++bool QCocoaIntegration::fontConfigFontEngine(bool enabled)
++{
++#if QT_CONFIG(fontconfig)
++    if (!mCanReplaceFontDatabase) {
++        return false;
++    }
++    auto options = mOptions;
++    bool ret = false;
++    if (enabled) {
++        options |= QCocoaIntegration::UseFreeTypeFontEngine | QCocoaIntegration::UseFontConfigDatabase;
++        if (options != mOptions) {
++            mOptions = options;
++            mFontDb.reset(new QFontconfigDatabase);
++            ret = true;
++        }
++    } else {
++        options &= ~QCocoaIntegration::UseFontConfigDatabase;
++        if (options != mOptions) {
++            mOptions = options;
++            // UseFreeTypeFontEngine is still set:
++            ret = freeTypeFontEngine(false);
++        }
++    }
++    return ret;
++#else
++    // can't be any other way
+     return false;
++#endif
+ }
+ 
+ QT_END_NAMESPACE
+diff --git a/src/qcocoa-qpa/qcocoanativeinterface.mm b/src/qcocoa-qpa/qcocoanativeinterface.mm
+index 612b9e4..3191b38 100644
+--- a/src/qcocoa-qpa/qcocoanativeinterface.mm
++++ b/src/qcocoa-qpa/qcocoanativeinterface.mm
+@@ -78,6 +78,11 @@ static bool qt_mac_use_freetype(bool enabled)
+     return QCocoaIntegration::instance()->freeTypeFontEngine(enabled);
+ }
+ 
++static bool qt_mac_use_fontconfig(bool enabled)
++{
++    return QCocoaIntegration::instance()->fontConfigFontEngine(enabled);
++}
++
+ 
+ QCocoaNativeInterface::QCocoaNativeInterface()
+ {
+@@ -152,6 +157,9 @@ QPlatformNativeInterface::NativeResourceForIntegrationFunction QCocoaNativeInter
+     if (resource.toLower() == "qt_mac_use_freetype") {
+         return NativeResourceForIntegrationFunction(qt_mac_use_freetype);
+     }
++    if (resource.toLower() == "qt_mac_use_fontconfig") {
++        return NativeResourceForIntegrationFunction(qt_mac_use_fontconfig);
++    }
+ 
+     return 0;
+ }
+diff --git a/src/qcocoa-qpa/qcocoatheme.mm b/src/qcocoa-qpa/qcocoatheme.mm
+index 4212801..ec48be2 100644
+--- a/src/qcocoa-qpa/qcocoatheme.mm
++++ b/src/qcocoa-qpa/qcocoatheme.mm
+@@ -50,6 +50,7 @@
+ #include "qcocoamenu.h"
+ #include "qcocoamenubar.h"
+ #include "qcocoahelpers.h"
++#include "qcocoaintegration.h"
+ 
+ #include <QtCore/qfileinfo.h>
+ #include <QtGui/private/qguiapplication_p.h>
+@@ -189,8 +190,13 @@ const QPalette *QCocoaTheme::palette(Palette type) const
+ 
+ QHash<QPlatformTheme::Font, QFont *> qt_mac_createRoleFonts()
+ {
+-    QCoreTextFontDatabase *ctfd = static_cast<QCoreTextFontDatabase *>(QGuiApplicationPrivate::platformIntegration()->fontDatabase());
+-    return ctfd->themeFonts();
++    QPlatformFontDatabase *db = QGuiApplicationPrivate::platformIntegration()->fontDatabase();
++    if (!dynamic_cast<QCoreTextFontDatabase *>(db)) {
++        // ctfd must point to a QFontconfigDatabase instance; create a temp QCoreTextFontDatabase
++        // (no need to cache things here, we're called once only)
++        return QCoreTextFontDatabase().themeFonts();
++    }
++    return static_cast<QCoreTextFontDatabase *>(db)->themeFonts();
+ }
+ 
+ const QFont *QCocoaTheme::font(Font type) const
