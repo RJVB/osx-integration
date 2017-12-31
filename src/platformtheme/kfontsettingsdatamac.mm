@@ -143,19 +143,48 @@ KFontSettingsDataMac::KFontSettingsDataMac(KdeMacTheme *theme)
         mFonts[i] = 0;
     }
 
-    KConfigGroup general(kdeGlobals(), "General");
-    const QString fontEngine = general.readEntry("fontEngine", QString());
-    if (!fontEngine.isEmpty() && QGuiApplication::platformName().contains(QLatin1String("cocoa"))) {
+    if (QGuiApplication::platformName().contains(QLatin1String("cocoa"))) {
+        KConfigGroup general(kdeGlobals(), "General");
+        const QString fontEngine = general.readEntry("fontEngine", QString());
+        bool useFreeType = false, useFontConfig = false, useCoreText = true;
+        if (!fontEngine.isEmpty()) {
+            useFreeType = fontEngine.compare(QLatin1String("FreeType"), Qt::CaseInsensitive) == 0;
+            useFontConfig = fontEngine.compare(QLatin1String("FontConfig"), Qt::CaseInsensitive) == 0;
+            // fontEngine=CoreText is the default and only handled so we can warn appropriately
+            // when the user tries to activate another, unknown font engine.
+            useCoreText = fontEngine.compare(QLatin1String("CoreText"), Qt::CaseInsensitive) == 0;
+        }
+        if (qgetenv("QT_MAC_FONTENGINE").toLower() == "freetype") {
+            useFontConfig = false;
+            useFreeType = true;
+        }
+        if (qgetenv("QT_MAC_FONTENGINE").toLower() == "fontconfig") {
+            useFreeType = false;
+            useFontConfig = true;
+        }
+        if (qgetenv("QT_MAC_FONTENGINE").toLower() == "coretext") {
+            // CoreText overrides all
+            useCoreText = true;
+        }
+        QString desired;
+        bool result = false;
         const auto ftptr = mTheme->platformFunction("qt_mac_use_freetype");
         const auto fcptr = mTheme->platformFunction("qt_mac_use_fontconfig");
-        bool useFreeType = fontEngine.compare(QLatin1String("FreeType"), Qt::CaseInsensitive) == 0;
-        bool useFontConfig = fontEngine.compare(QLatin1String("FontConfig"), Qt::CaseInsensitive) == 0;
-        // fontEngine=CoreText is the default and only handled so we can warn appropriately
-        // when the user tries to activate another, unknown font engine.
-        bool useCoreText = fontEngine.compare(QLatin1String("CoreText"), Qt::CaseInsensitive) == 0;
-        bool result = false;
         typedef bool (*fontengineEnabler)(bool enabled);
-        if (useFontConfig) {
+        if (useCoreText) {
+            desired = QStringLiteral("CoreText");
+            if (fcptr) {
+                reinterpret_cast<fontengineEnabler>(fcptr)(false);
+            }
+            if (ftptr) {
+                result = reinterpret_cast<fontengineEnabler>(ftptr)(false);
+                if (!result) {
+                    // at this point failure *probably* means that:
+                    qCWarning(PLATFORMTHEME) << "The" << desired << "fontengine was probably still enabled";
+                }
+            }
+        } else if (useFontConfig) {
+            desired = QStringLiteral("FontConfig");
             if (fcptr) {
                 result = reinterpret_cast<fontengineEnabler>(fcptr)(useFontConfig);
             } else {
@@ -163,17 +192,15 @@ KFontSettingsDataMac::KFontSettingsDataMac(KdeMacTheme *theme)
                     "\tthis probably means Qt was built without FontConfig support or\n"
                     "\tthat you're not using the QAltCocoa QPA plugin.";
             }
-        } else if (ftptr) {
-            result = reinterpret_cast<fontengineEnabler>(ftptr)(useFreeType);
-        } else {
-            qCWarning(PLATFORMTHEME) << "Cannot use the FreeType fontdatabase:\n"
-                "\tthis probably means Qt was built without FreeType support or\n"
-                "\tthat you're not using the QAltCocoa QPA plugin.";
-        }
-        if (!result) {
-            qCWarning(PLATFORMTHEME) << "Couldn't"
-                << (useFreeType || useFontConfig || !useCoreText? "enable" : "disable")
-                << "the" << fontEngine << "fontengine";
+        } else if (useFreeType) {
+            desired = QStringLiteral("FreeType");
+            if (ftptr) {
+                result = reinterpret_cast<fontengineEnabler>(ftptr)(useFreeType);
+            } else {
+                qCWarning(PLATFORMTHEME) << "Cannot use the FreeType fontdatabase:\n"
+                    "\tthis probably means Qt was built without FreeType support or\n"
+                    "\tthat you're not using the QAltCocoa QPA plugin.";
+            }
         }
     }
 
