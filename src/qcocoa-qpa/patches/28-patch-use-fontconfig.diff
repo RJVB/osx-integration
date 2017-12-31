@@ -68,11 +68,11 @@ index ecf54b4..65dc3df 100644
  #endif
              qWarning() << "Unknown option" << param;
 @@ -332,17 +339,51 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
-     if (qt_mac_resolveOption(false, "QT_MAC_USE_FREETYPE")) {
+     if (qgetenv("QT_MAC_FONTENGINE").toLower() == "freetype") {
          mOptions |= QCocoaIntegration::UseFreeTypeFontEngine;
      }
 +# if QT_CONFIG(fontconfig)
-+    if (qt_mac_resolveOption(false, "QT_MAC_USE_FONTCONFIG")) {
++    if (qgetenv("QT_MAC_FONTENGINE").toLower() == "fontconfig") {
 +        mOptions |= QCocoaIntegration::UseFontConfigDatabase;
 +    }
 +# endif

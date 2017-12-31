@@ -336,11 +336,11 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
     mInstance = this;
 
 #ifndef QT_NO_FREETYPE
-    if (qt_mac_resolveOption(false, "QT_MAC_USE_FREETYPE")) {
+    if (qgetenv("QT_MAC_FONTENGINE").toLower() == "freetype") {
         mOptions |= QCocoaIntegration::UseFreeTypeFontEngine;
     }
 # if QT_CONFIG(fontconfig)
-    if (qt_mac_resolveOption(false, "QT_MAC_USE_FONTCONFIG")) {
+    if (qgetenv("QT_MAC_FONTENGINE").toLower() == "fontconfig") {
         mOptions |= QCocoaIntegration::UseFontConfigDatabase;
     }
 # endif
