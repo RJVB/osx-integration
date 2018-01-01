@@ -357,7 +357,7 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
     m_fontSmoothingGamma = 1.5;
 #endif
 #else
-    m_fontSmoothingGamma = 0.975
+    m_fontSmoothingGamma = 0.975;
 #endif
     if (qEnvironmentVariableIsSet("QT_MAC_FREETYPE_FONT_GAMMA")) {
         bool ok = false;

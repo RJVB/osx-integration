@@ -95,7 +95,7 @@ index ecf54b4..65dc3df 100644
 -        mFontDb.reset(new QCoreTextFontDatabaseEngineFactory<QCoreTextFontEngine>);
  #else
 -    mFontDb.reset(new QCoreTextFontDatabase(mOptions.testFlag(UseFreeTypeFontEngine)));
-+    m_fontSmoothingGamma = 0.975
++    m_fontSmoothingGamma = 0.975;
  #endif
 +    if (qEnvironmentVariableIsSet("QT_MAC_FREETYPE_FONT_GAMMA")) {
 +        bool ok = false;
