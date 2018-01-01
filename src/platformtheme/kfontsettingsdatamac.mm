@@ -146,7 +146,8 @@ KFontSettingsDataMac::KFontSettingsDataMac(KdeMacTheme *theme)
     if (QGuiApplication::platformName().contains(QLatin1String("cocoa"))) {
         KConfigGroup general(kdeGlobals(), "General");
         const QString fontEngine = general.readEntry("fontEngine", QString());
-        bool useFreeType = false, useFontConfig = false, useCoreText = true;
+        // don't do anything if no instructions are given in kdeglobals or the environment
+        bool useFreeType = false, useFontConfig = false, useCoreText = false;
         if (!fontEngine.isEmpty()) {
             useFreeType = fontEngine.compare(QLatin1String("FreeType"), Qt::CaseInsensitive) == 0;
             useFontConfig = fontEngine.compare(QLatin1String("FontConfig"), Qt::CaseInsensitive) == 0;
