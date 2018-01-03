@@ -88,6 +88,7 @@ if(Qt5_FOUND AND (NOT ${Qt5_VERSION} VERSION_LESS ${QT_REAL_MIN_VERSION}))
             ${Qt5Widgets_PRIVATE_INCLUDE_DIRS}
             ${Qt5Gui_PRIVATE_INCLUDE_DIRS}
             ${Qt5PrintSupport_PRIVATE_INCLUDE_DIRS}
+            ${FREETYPE_INCLUDE_DIRS}
             ${QT_INCLUDES_DIR}
             ${QT_INCLUDES_DIR}/QtClipboardSupport/${Qt5_VERSION}
             ${QT_INCLUDES_DIR}/QtFontDatabaseSupport/${Qt5_VERSION}

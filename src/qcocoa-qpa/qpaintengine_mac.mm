@@ -1005,6 +1005,9 @@ void QCoreGraphicsPaintEngine::drawTextItem(const QPointF &pos, const QTextItem 
         case QFontEngine::Mac:
             static_cast<QCoreTextFontEngine *>(fe)->draw(d->hd, pos.x(), pos.y(), ti, paintDevice()->height());
             break;
+        case QFontEngine::Freetype:
+            QPaintEngine::drawTextItem(pos, item);
+            break;
         case QFontEngine::Box:
             d->drawBoxTextItem(pos, ti);
             break;
