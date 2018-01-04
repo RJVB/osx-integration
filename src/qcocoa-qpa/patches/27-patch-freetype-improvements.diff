@@ -106,14 +106,26 @@ diff --git a/cocoa/qpaintengine_mac.mm b/cocoa/qpaintengine_mac.mm
 index 7e241e3ae68640674ad4602cbc8fd641f360852b..bbf22c0970a0da047a9514ffa6c46d22185b09c6 100644
 --- a/cocoa/qpaintengine_mac.mm
 +++ b/cocoa/qpaintengine_mac.mm
-@@ -1005,6 +1005,9 @@ void QCoreGraphicsPaintEngine::drawTextItem(const QPointF &pos, const QTextItem
-         case QFontEngine::Mac:
-             static_cast<QCoreTextFontEngine *>(fe)->draw(d->hd, pos.x(), pos.y(), ti, paintDevice()->height());
-             break;
-+        case QFontEngine::Freetype:
-+            QPaintEngine::drawTextItem(pos, item);
-+            break;
-         case QFontEngine::Box:
-             d->drawBoxTextItem(pos, ti);
-             break;
-
+@@ -965,10 +965,13 @@ QCoreGraphicsPaintEngine::drawTiledPixmap(const QRectF &r, const QPixmap &pixmap
+ void QCoreGraphicsPaintEngine::drawTextItem(const QPointF &pos, const QTextItem &item)
+ {
+     Q_D(QCoreGraphicsPaintEngine);
++    const QTextItemInt &ti = static_cast<const QTextItemInt &>(item);
++
+     if (d->current.transform.type() == QTransform::TxProject
+ #ifndef QMAC_NATIVE_GRADIENTS
+         || painter()->pen().brush().gradient()  //Just let the base engine "emulate" the gradient
+ #endif
++        || ti.fontEngine->type() == QFontEngine::Freetype
+         ) {
+         QPaintEngine::drawTextItem(pos, item);
+         return;
+@@ -977,8 +980,6 @@ void QCoreGraphicsPaintEngine::drawTextItem(const QPointF &pos, const QTextItem
+     if (state->compositionMode() == QPainter::CompositionMode_Destination)
+         return;
+ 
+-    const QTextItemInt &ti = static_cast<const QTextItemInt &>(item);
+-
+     QPen oldPen = painter()->pen();
+     QBrush oldBrush = painter()->brush();
+     QPointF oldBrushOrigin = painter()->brushOrigin();

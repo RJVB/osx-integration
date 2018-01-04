@@ -965,10 +965,13 @@ QCoreGraphicsPaintEngine::drawTiledPixmap(const QRectF &r, const QPixmap &pixmap
 void QCoreGraphicsPaintEngine::drawTextItem(const QPointF &pos, const QTextItem &item)
 {
     Q_D(QCoreGraphicsPaintEngine);
+    const QTextItemInt &ti = static_cast<const QTextItemInt &>(item);
+
     if (d->current.transform.type() == QTransform::TxProject
 #ifndef QMAC_NATIVE_GRADIENTS
         || painter()->pen().brush().gradient()  //Just let the base engine "emulate" the gradient
 #endif
+        || ti.fontEngine->type() == QFontEngine::Freetype
         ) {
         QPaintEngine::drawTextItem(pos, item);
         return;
@@ -976,8 +979,6 @@ void QCoreGraphicsPaintEngine::drawTextItem(const QPointF &pos, const QTextItem 
 
     if (state->compositionMode() == QPainter::CompositionMode_Destination)
         return;
-
-    const QTextItemInt &ti = static_cast<const QTextItemInt &>(item);
 
     QPen oldPen = painter()->pen();
     QBrush oldBrush = painter()->brush();
@@ -1004,9 +1005,6 @@ void QCoreGraphicsPaintEngine::drawTextItem(const QPointF &pos, const QTextItem 
         switch (fe->type()) {
         case QFontEngine::Mac:
             static_cast<QCoreTextFontEngine *>(fe)->draw(d->hd, pos.x(), pos.y(), ti, paintDevice()->height());
-            break;
-        case QFontEngine::Freetype:
-            QPaintEngine::drawTextItem(pos, item);
             break;
         case QFontEngine::Box:
             d->drawBoxTextItem(pos, ti);
