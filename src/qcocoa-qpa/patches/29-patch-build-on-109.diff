@@ -1,0 +1,44 @@
+diff --git a/cocoa/qcocoawindow.mm b/cocoa/qcocoawindow.mm
+index 7c8269c6539cc345804ce7216e57adcbf0b69d6e..ae786fe09c0b96edb38ade08e6b2484045458b32 100644
+--- a/cocoa/qcocoawindow.mm
++++ b/cocoa/qcocoawindow.mm
+@@ -70,6 +70,10 @@
+ #   define NSWINPROPERTY(w,property,selector) [(w) selector]
+ #endif
+ 
++#ifndef __has_builtin
++#   define __has_builtin(x) false
++#endif
++
+ enum {
+     defaultWindowWidth = 160,
+     defaultWindowHeight = 160
+@@ -2250,14 +2254,16 @@ void QCocoaWindow::applyContentBorderThickness(NSWindow *window)
+ 
+     QMacAutoReleasePool pool;
+ 
+-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101200
++// #if __MAC_OS_X_VERSION_MAX_ALLOWED < 101200
++#if !__has_builtin(__builtin_available)
+     bool hasTitlebarAppearsTransparent = [window respondsToSelector:@selector(setTitlebarAppearsTransparent:)];
+ #endif
+ 
+     if (!m_drawContentBorderGradient) {
+         [window setStyleMask:[window styleMask] & ~NSTexturedBackgroundWindowMask];
+         [[[window contentView] superview] setNeedsDisplay:YES];
+-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
++// #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
++#if __has_builtin(__builtin_available)
+         if (__builtin_available(macOS 10.10, *)) {
+             window.titlebarAppearsTransparent = NO;
+         }
+@@ -2290,7 +2296,8 @@ void QCocoaWindow::applyContentBorderThickness(NSWindow *window)
+     int effectiveBottomContentBorderThickness = m_bottomContentBorderThickness;
+ 
+     [window setStyleMask:[window styleMask] | NSTexturedBackgroundWindowMask];
+-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
++// #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
++#if __has_builtin(__builtin_available)
+     if (__builtin_available(macOS 10.10, *)) {
+         window.titlebarAppearsTransparent = YES;
+     }
