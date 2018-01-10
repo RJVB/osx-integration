@@ -1,3 +1,11 @@
+20180110 : upstream head (5.9): 1df2906c75f379a62bce487d3d2db3ade3095b16
+ src/plugins/platforms/cocoa/qnsview.mm                               |   7 +-
+patch: 30-sync-upstream-180110.diff
+Changes: git log b0938cb6c1fa29ec2d2a4fb9273e515cd0d6c08e..1df2906c75f379a62bce487d3d2db3ade3095b16 src/plugins/platforms/cocoa
+commit 4f76c2dbadb09a27cecaba5a36512f68fac3d319
+    Cocoa: make "Send correct mouse buttons for tablets" optional
+
+
 20171231
 Improved control over selecting the FreeType fontengine and equivalent options
 to select the use of a FontConfig fontdatabase with FreeType fontengine.
