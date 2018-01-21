@@ -726,7 +726,7 @@ QPlatformSystemTrayIcon *KdeMacTheme::createPlatformSystemTrayIcon() const
 {
     if (nativeTheme) {
         const auto systray = nativeTheme->createPlatformSystemTrayIcon();
-        if (!m_isCocoa) {
+        if (!m_isCocoa && verbose) {
             qCWarning(PLATFORMTHEME) << "Created native systray icon" << systray;
         }
         return systray;
