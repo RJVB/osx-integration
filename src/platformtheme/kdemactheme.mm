@@ -421,16 +421,21 @@ KdeMacTheme::KdeMacTheme()
     // first things first: instruct Qt not to use the Mac-style toplevel menubar
     // if we are not using the Cocoa QPA plugin (but the XCB QPA instead).
     platformName = QGuiApplication::platformName();
+    QString platformThemeName;
     if (!platformName.contains(QLatin1String("cocoa"))) {
         QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar, true);
         QCoreApplication::setAttribute(Qt::AA_MacDontSwapCtrlAndMeta, true);
         m_isCocoa = false;
+        // we will almost certainly be using the xcb QPA ("X11"). We'll proxy
+        // the generic Unix theme, *not* the KDE theme. That'd be redundant.
+        platformThemeName = QStringLiteral("generic");
     } else {
         m_isCocoa = true;
+        platformThemeName = platformName;
     }
     QPlatformIntegration *pi = QGuiApplicationPrivate::platformIntegration();
     if (pi) {
-        nativeTheme = pi->createPlatformTheme(platformName);
+        nativeTheme = pi->createPlatformTheme(platformThemeName);
     } else {
         nativeTheme = Q_NULLPTR;
     }
@@ -720,7 +725,11 @@ QPlatformDialogHelper *KdeMacTheme::createPlatformDialogHelper(QPlatformTheme::D
 QPlatformSystemTrayIcon *KdeMacTheme::createPlatformSystemTrayIcon() const
 {
     if (nativeTheme) {
-        return nativeTheme->createPlatformSystemTrayIcon();
+        const auto systray = nativeTheme->createPlatformSystemTrayIcon();
+        if (!m_isCocoa) {
+            qCWarning(PLATFORMTHEME) << "Created native systray icon" << systray;
+        }
+        return systray;
     }
     // TODO: figure out if it makes sense to return something other than 
     // nativeTheme->createPlatformSystemTrayIcon() or even NULL
