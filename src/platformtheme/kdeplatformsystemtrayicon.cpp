@@ -27,6 +27,7 @@
 #ifdef DBUS_SUPPORT_ENABLED
 #include <QDBusInterface>
 #endif
+#include <QSystemTrayIcon>
 
 SystemTrayMenu::SystemTrayMenu()
     : QPlatformMenu()
@@ -344,13 +345,15 @@ void KDEPlatformSystemTrayIcon::showMessage(const QString &title, const QString 
 bool KDEPlatformSystemTrayIcon::isSystemTrayAvailable() const
 {
 #ifdef DBUS_SUPPORT_ENABLED
-    QDBusInterface systrayHost(QStringLiteral("org.kde.StatusNotifierWatcher"), QStringLiteral("/StatusNotifierWatcher"), QStringLiteral("org.kde.StatusNotifierWatcher"));
-    if (systrayHost.isValid()) {
-        return systrayHost.property("IsStatusNotifierHostRegistered").toBool();
+    if (QGuiApplication::platformName().compare(QStringLiteral("cocoa"), Qt::CaseInsensitive)) {
+        QDBusInterface systrayHost(QStringLiteral("org.kde.StatusNotifierWatcher"), QStringLiteral("/StatusNotifierWatcher"), QStringLiteral("org.kde.StatusNotifierWatcher"));
+        if (systrayHost.isValid()) {
+            return systrayHost.property("IsStatusNotifierHostRegistered").toBool();
+        }
     }
 #endif
 
-    return false;
+    return QSystemTrayIcon::isSystemTrayAvailable();
 }
 
 bool KDEPlatformSystemTrayIcon::supportsMessages() const
