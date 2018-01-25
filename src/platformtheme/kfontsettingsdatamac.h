@@ -57,11 +57,14 @@ protected Q_SLOTS:
 
 public:
     QFont *font(FontTypes fontType);
+    bool usingCoreText();
+
 private:
     KFontSettingsDataMac();
 
     QFont *mFonts[FontTypesCount];
     KdeMacTheme *mTheme;
+    bool mUseCoreText;
 };
 
 #endif // KFONTSETTINGSDATAMAC_H

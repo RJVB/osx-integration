@@ -147,13 +147,14 @@ KFontSettingsDataMac::KFontSettingsDataMac(KdeMacTheme *theme)
         KConfigGroup general(kdeGlobals(), "General");
         const QString fontEngine = general.readEntry("fontEngine", QString());
         // don't do anything if no instructions are given in kdeglobals or the environment
-        bool useFreeType = false, useFontConfig = false, useCoreText = false;
+        bool useFreeType = false, useFontConfig = false;
+        mUseCoreText = false;
         if (!fontEngine.isEmpty()) {
             useFreeType = fontEngine.compare(QLatin1String("FreeType"), Qt::CaseInsensitive) == 0;
             useFontConfig = fontEngine.compare(QLatin1String("FontConfig"), Qt::CaseInsensitive) == 0;
             // fontEngine=CoreText is the default and only handled so we can warn appropriately
             // when the user tries to activate another, unknown font engine.
-            useCoreText = fontEngine.compare(QLatin1String("CoreText"), Qt::CaseInsensitive) == 0;
+            mUseCoreText = fontEngine.compare(QLatin1String("CoreText"), Qt::CaseInsensitive) == 0;
         }
         if (qgetenv("QT_MAC_FONTENGINE").toLower() == "freetype") {
             useFontConfig = false;
@@ -165,14 +166,14 @@ KFontSettingsDataMac::KFontSettingsDataMac(KdeMacTheme *theme)
         }
         if (qgetenv("QT_MAC_FONTENGINE").toLower() == "coretext") {
             // CoreText overrides all
-            useCoreText = true;
+            mUseCoreText = true;
         }
         QString desired;
         bool result = false;
         const auto ftptr = mTheme->platformFunction("qt_mac_use_freetype");
         const auto fcptr = mTheme->platformFunction("qt_mac_use_fontconfig");
         typedef bool (*fontengineEnabler)(bool enabled);
-        if (useCoreText) {
+        if (mUseCoreText) {
             desired = QStringLiteral("CoreText");
             if (fcptr) {
                 reinterpret_cast<fontengineEnabler>(fcptr)(false);
@@ -272,7 +273,6 @@ QFont *KFontSettingsDataMac::font(FontTypes fontType)
         const KFontData &fontData = DefaultFontData[fontType];
 
         cachedFont = new QFont(QLatin1String(fontData.FontName), fontData.Size, forceBold? QFont::Bold : fontData.Weight);
-        cachedFont->setStyleHint(fontData.StyleHint);
         // ignore the default stylehint; works better converting medium -> bold
 //         cachedFont->setStyleName(QLatin1String(fontData.StyleName));
 //         if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE")) {
@@ -295,6 +295,11 @@ QFont *KFontSettingsDataMac::font(FontTypes fontType)
             }
         }
 
+        // experimental: force outline mode when not using CoreText. This should prevent the FreeType
+        // font engine from picking up and using X11 bitmap fonts, should those be installed.
+        if (!mUseCoreText) {
+            cachedFont->setStyleHint(fontData.StyleHint, QFont::ForceOutline);
+        }
         mFonts[fontType] = cachedFont;
     }
     return cachedFont;
