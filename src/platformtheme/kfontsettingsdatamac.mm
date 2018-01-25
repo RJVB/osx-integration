@@ -204,6 +204,8 @@ KFontSettingsDataMac::KFontSettingsDataMac(KdeMacTheme *theme)
                     "\tthat you're not using the QAltCocoa QPA plugin.";
             }
         }
+    } else {
+        mUseCoreText = false;
     }
 
 }
