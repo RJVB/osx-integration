@@ -299,7 +299,9 @@ QFont *KFontSettingsDataMac::font(FontTypes fontType)
 
         // experimental: force outline mode when not using CoreText. This should prevent the FreeType
         // font engine from picking up and using X11 bitmap fonts, should those be installed.
-        if (!mUseCoreText) {
+        if (mUseCoreText) {
+            cachedFont->setStyleHint(fontData.StyleHint);
+        } else {
             cachedFont->setStyleHint(fontData.StyleHint, QFont::ForceOutline);
         }
         mFonts[fontType] = cachedFont;
