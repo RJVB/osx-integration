@@ -72,8 +72,6 @@
 **
 ****************************************************************************/
 
-#define QT_MAC_SYSTEMTRAY_USE_GROWL
-
 #include "qcocoasystemtrayicon.h"
 
 #ifndef QT_NO_SYSTEMTRAYICON
@@ -288,9 +286,6 @@ void QCocoaSystemTrayIcon::showMessage(const QString &title, const QString &mess
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 QT_END_NAMESPACE
-
-@implementation NSStatusItem (Qt)
-@end
 
 @implementation QNSImageView
 -(id)initWithParent:(QNSStatusItem*)myParent {

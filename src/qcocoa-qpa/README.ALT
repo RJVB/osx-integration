@@ -1,3 +1,31 @@
+20180128 : upstream head (5.9): 5a05348fb6c3940449a9c2950bb65bdea2112a15 (v5.9.4-70-g5a05348fb6)
+ src/plugins/platforms/cocoa/qcocoaapplication.h                              |    12 -
+ src/plugins/platforms/cocoa/qcocoaapplication.mm                             |    30 +-
+ src/plugins/platforms/cocoa/qcocoaapplicationdelegate.mm                     |    18 +
+ src/plugins/platforms/cocoa/qcocoacolordialoghelper.mm                       |     2 +-
+ src/plugins/platforms/cocoa/qcocoafontdialoghelper.mm                        |     2 +-
+ src/plugins/platforms/cocoa/qcocoahelpers.h                                  |     7 +-
+ src/plugins/platforms/cocoa/qcocoahelpers.mm                                 |     2 +-
+ src/plugins/platforms/cocoa/qcocoanativeinterface.mm                         |     4 +-
+ src/plugins/platforms/cocoa/qcocoasystemtrayicon.mm                          |     5 -
+ src/plugins/platforms/cocoa/qcocoawindow.h                                   |     3 +
+ src/plugins/platforms/cocoa/qcocoawindow.mm                                  |     5 +
+patch: patches/31-sync-upstream-180128.diff
+Changes: git log 1df2906c75f379a62bce487d3d2db3ade3095b16..5a05348fb6c3940449a9c2950bb65bdea2112a15 src/plugins/platforms/cocoa
+commit 089969540f4877c778172ee0ccbd69960a179b43
+    Remove traces of Growl in QSystemTrayIcon code and documentation
+commit 965bcca6d4e22788721a9af906adfbd97af9af29
+    Cocoa: Explicitly hide popup windows when the application is hidden
+commit 0c5953fd4edbb8e6495aaf288186dbd6737fb8c0
+    macOS: Namespace FullScreenProperty category on NSWindow
+commit 841542225bf5d3f1c4b3fd4c24adf4201f3a131f
+    macOS: Simplify mangling of QNSPanelDelegate protocol
+commit 3f6bc9a9838e1bf27c10a01cfb2237afb60afe70
+    macOS: Namespace QNSWindowProtocol when building with -qtnamespace
+commit 36ddfb6cc1bb4ece153e19d86e0175cbb7052310
+    macOS: Replace category methods with functions
+
+
 20180110 : upstream head (5.9): 1df2906c75f379a62bce487d3d2db3ade3095b16
  src/plugins/platforms/cocoa/qnsview.mm                               |   7 +-
 patch: 30-sync-upstream-180110.diff
