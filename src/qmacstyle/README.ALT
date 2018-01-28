@@ -1,3 +1,10 @@
+20180128 : upstream head (5.9): 5a05348fb6c3940449a9c2950bb65bdea2112a15 (v5.9.4-70-g5a05348fb6)
+ src/widgets/styles/qmacstyle_mac.mm                                          |     8 +-
+patch: patches/20-sync-upstream-180128.diff
+Changes: git log b0938cb6c1fa29ec2d2a4fb9273e515cd0d6c08e..5a05348fb6c3940449a9c2950bb65bdea2112a15 src/widgets/styles/qmacstyle_mac.mm
+commit 0d9208cecbbd9ed08e4ffb6540729668e3bd7754 (tag: v5.9.4, origin/5.9.4)
+    QMacStyle: Revert state changes for PE_IndicatorMenuCheckMark
+
 20171219 : upstream head (5.9): b0938cb6c1fa29ec2d2a4fb9273e515cd0d6c08e
  src/corelib/global/qoperatingsystemversion_p.h                                      |   8 --
 patch: patches/19-sync-upstream-171219.diff
