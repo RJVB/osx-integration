@@ -1,5 +1,5 @@
 /*  This file is part of the KDE libraries
- *  Copyright 2014 Martin Gr√§√ülin <mgraesslin@kde.org>
+ *  Copyright 2014 Martin Gr‰ﬂlin <mgraesslin@kde.org>
  *
  *  This library is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -48,6 +48,11 @@ SystemTrayMenu::~SystemTrayMenu()
 QPlatformMenuItem *SystemTrayMenu::createMenuItem() const
 {
     return new SystemTrayMenuItem();
+}
+
+QPlatformMenu *SystemTrayMenu::createSubMenu() const
+{
+    return new SystemTrayMenu();
 }
 
 void SystemTrayMenu::insertMenuItem(QPlatformMenuItem *menuItem, QPlatformMenuItem *before)
@@ -243,6 +248,21 @@ void SystemTrayMenuItem::setVisible(bool isVisible)
 void SystemTrayMenuItem::setIconSize(int size)
 {
     Q_UNUSED(size);
+}
+
+void SystemTrayMenuItem::setHasExclusiveGroup(bool hasExclusiveGroup)
+{
+    if (hasExclusiveGroup) {
+        if (!m_action->actionGroup()) {
+            m_action->setActionGroup(new QActionGroup(m_action));
+        }
+    } else {
+        QActionGroup *actionGroup = m_action->actionGroup();
+        if (actionGroup) {
+            m_action->setActionGroup(nullptr);
+            delete actionGroup;
+        }
+    }
 }
 
 quintptr SystemTrayMenuItem::tag() const

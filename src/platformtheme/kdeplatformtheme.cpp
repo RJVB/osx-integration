@@ -246,7 +246,7 @@ QList<QKeySequence> KdePlatformTheme::keyBindings(QKeySequence::StandardKey key)
 
 bool KdePlatformTheme::usePlatformNativeDialog(QPlatformTheme::DialogType type) const
 {
-    return type == QPlatformTheme::FileDialog;
+    return type == QPlatformTheme::FileDialog && qobject_cast<QApplication*>(QCoreApplication::instance());
 }
 
 QString KdePlatformTheme::standardButtonText(int button) const
@@ -318,7 +318,8 @@ QPlatformSystemTrayIcon *KdePlatformTheme::createPlatformSystemTrayIcon() const
 //force QtQuickControls2 to use the desktop theme as default
 void KdePlatformTheme::setQtQuickControlsTheme()
 {
-    //if the user is running only a QGuiApplication. Abort as this style is all about QWidgets and we know setting this will make it crash
+    //if the user is running only a QGuiApplication, explicitely unset the QQC1 desktop style and abort
+    //as this style is all about QWidgets and we know setting this will make it crash
     if (!qobject_cast<QApplication*>(qApp)) {
         if (qgetenv("QT_QUICK_CONTROLS_1_STYLE").right(7) == "Desktop") {
             qunsetenv("QT_QUICK_CONTROLS_1_STYLE");
