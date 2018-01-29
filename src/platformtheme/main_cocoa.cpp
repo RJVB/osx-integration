@@ -24,6 +24,7 @@
 #include <QWidget>
 #include <QApplication>
 #include <QDebug>
+#include <QPluginLoader>
 
 #include "kdemactheme.h"
 #include "platformtheme_logging.h"
@@ -40,6 +41,8 @@
 // This file should be kept in sync with main_kde.cpp !!
 // NB NB
 
+static QPluginLoader unloadProtection;
+
 class CocoaPlatformThemePlugin : public QPlatformThemePlugin
 {
     Q_OBJECT
@@ -55,12 +58,34 @@ public:
             qApp->installEventFilter(this);
         }
     }
+    ~CocoaPlatformThemePlugin()
+    {
+        if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE")) {
+            qCWarning(PLATFORMTHEME) << Q_FUNC_INFO;
+        }
+    }
 
     QPlatformTheme *create(const QString &key, const QStringList &paramList) override
     {
         Q_UNUSED(key)
         Q_UNUSED(paramList)
         if (!qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_DISABLED")) {
+            if (unloadProtection.fileName().isEmpty()) {
+                unloadProtection.setFileName(QStringLiteral("platformthemes/" PLATFORM_PLUGIN_FILE_NAME));
+                if (unloadProtection.fileName().isEmpty()) {
+                    // try with the non-standard extension - probably redundant but I won't
+                    // count on Qt to try the .so extension on Mac forever.
+                    unloadProtection.setFileName(QStringLiteral("platformthemes/" PLATFORM_PLUGIN_FILE_NAME ".so"));
+                }
+                // using a global static loader instance should already prevent us from being unloaded
+                // too early; add an additional layer of protection:
+                unloadProtection.setLoadHints(QLibrary::PreventUnloadHint);
+                bool success = unloadProtection.load();
+                if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE")) {
+                    qCWarning(PLATFORMTHEME) << "loaded from:"
+                        << unloadProtection.fileName() << "unload protection:" << success;
+                }
+            }
             return new KdeMacTheme;
         } else {
             return nullptr;
