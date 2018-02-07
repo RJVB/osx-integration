@@ -43,6 +43,7 @@
 #endif
 
 #include <qversionnumber.h>
+#include <qdebug.h>
 
 #if defined(Q_OS_ANDROID)
 #include <private/qjni_p.h>
@@ -154,6 +155,8 @@ QT_BEGIN_NAMESPACE
     \fn QOperatingSystemVersion QOperatingSystemVersion::current()
 
     Returns a QOperatingSystemVersion indicating the current OS and its version number.
+
+    \sa currentType()
 */
 #if !defined(Q_OS_DARWIN) && !defined(Q_OS_WIN)
 QOperatingSystemVersion QOperatingSystemVersion::current()
@@ -296,6 +299,14 @@ int QOperatingSystemVersion::compare(const QOperatingSystemVersion &v1,
     Returns the OS type identified by the QOperatingSystemVersion.
 
     \sa name()
+*/
+
+/*!
+    \fn QOperatingSystemVersion::OSType QOperatingSystemVersion::currentType()
+
+    Returns the current OS type without constructing a QOperatingSystemVersion instance.
+
+    \sa current()
 */
 
 /*!
@@ -500,5 +511,17 @@ const QOperatingSystemVersion QOperatingSystemVersion::AndroidNougat =
  */
 const QOperatingSystemVersion QOperatingSystemVersion::AndroidNougat_MR1 =
     QOperatingSystemVersion(QOperatingSystemVersion::Android, 7, 1);
+
+#ifndef QT_NO_DEBUG_STREAM
+QDebug operator<<(QDebug debug, const QOperatingSystemVersion &ov)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace();
+    debug << "QOperatingSystemVersion(" << ov.name()
+        << ", " << ov.majorVersion() << '.' << ov.minorVersion()
+        << '.' << ov.microVersion() << ')';
+    return debug;
+}
+#endif // !QT_NO_DEBUG_STREAM
 
 QT_END_NAMESPACE

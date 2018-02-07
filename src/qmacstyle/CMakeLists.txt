@@ -46,7 +46,7 @@ if(Qt5_FOUND AND (NOT ${Qt5_VERSION} VERSION_LESS ${QT_REAL_MIN_VERSION}))
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
-        "-framework AppKit -framework Carbon")
+        "-framework ApplicationServices -framework AppKit -framework Carbon")
     install(TARGETS qaltmacstyle DESTINATION ${KDE_INSTALL_QTPLUGINDIR}/styles)
 
 #     # Generate a .qmake.cache file that coerce qmake to build more like we're building ourselves
