@@ -1,3 +1,14 @@
+20180207 : upstream head (5.9): fef6b31b994befac0ee14391572ebc2b9b33e104 (v5.9.4-86-gfef6b31b99)
+ src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm         |  12 ++-
+ src/plugins/platforms/cocoa/qcocoamenu.mm                     |   6 +-
+patch: patches/32-sync-upstream-180207.diff
+Changes: git log 5a05348fb6c3940449a9c2950bb65bdea2112a15..fef6b31b994befac0ee14391572ebc2b9b33e104 src/plugins/platforms/cocoa
+commit 1ffc6ba402114a3443df5309dec186fd337e5b66
+    macOS: fix menu positioning on high-DPI
+commit 9b2913377807b3dae107befeec0bc488f4a2cbad
+    Fix QFileDialog::defaultSuffix on macOS
+
+
 20180128 : upstream head (5.9): 5a05348fb6c3940449a9c2950bb65bdea2112a15 (v5.9.4-70-g5a05348fb6)
  src/plugins/platforms/cocoa/qcocoaapplication.h                              |    12 -
  src/plugins/platforms/cocoa/qcocoaapplication.mm                             |    30 +-
