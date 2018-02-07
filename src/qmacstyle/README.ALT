@@ -1,9 +1,17 @@
+20180207 : upstream head (5.9): fef6b31b994befac0ee14391572ebc2b9b33e104 (v5.9.4-86-gfef6b31b99)
+ src/widgets/widgets/qcombobox.cpp                             |   4 +-
+patch: patches/21-sync-upstream-180207.diff
+Changes: git log 5a05348fb6c3940449a9c2950bb65bdea2112a15..fef6b31b994befac0ee14391572ebc2b9b33e104 src/widgets/widgets/qcombobox.cpp
+commit 1cc15c4b6d65a22ab4018226a96baf843feb1f00
+    QComboBoxPrivate::showNativePopup(): Scale target rectangle
+
 20180128 : upstream head (5.9): 5a05348fb6c3940449a9c2950bb65bdea2112a15 (v5.9.4-70-g5a05348fb6)
  src/widgets/styles/qmacstyle_mac.mm                                          |     8 +-
 patch: patches/20-sync-upstream-180128.diff
 Changes: git log b0938cb6c1fa29ec2d2a4fb9273e515cd0d6c08e..5a05348fb6c3940449a9c2950bb65bdea2112a15 src/widgets/styles/qmacstyle_mac.mm
 commit 0d9208cecbbd9ed08e4ffb6540729668e3bd7754 (tag: v5.9.4, origin/5.9.4)
     QMacStyle: Revert state changes for PE_IndicatorMenuCheckMark
+
 
 20171219 : upstream head (5.9): b0938cb6c1fa29ec2d2a4fb9273e515cd0d6c08e
  src/corelib/global/qoperatingsystemversion_p.h                                      |   8 --
