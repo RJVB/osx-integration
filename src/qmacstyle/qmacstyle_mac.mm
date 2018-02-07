@@ -60,8 +60,8 @@
 #include <qapplication.h>
 #include <qbitmap.h>
 #if QT_CONFIG(combobox)
-#include <private/qcombobox_p.h>
-#include <qcombobox.h>
+#include "qcombobox_p.h"
+#include "qcombobox.h"
 #endif
 #if QT_CONFIG(dialogbuttonbox)
 #include <qdialogbuttonbox.h>
@@ -118,7 +118,7 @@
 #if QT_CONFIG(tableview)
 #include <qtableview.h>
 #endif
-#include <qoperatingsystemversion.h>
+#include "qoperatingsystemversion.h"
 #if QT_CONFIG(wizard)
 #include <qwizard.h>
 #endif

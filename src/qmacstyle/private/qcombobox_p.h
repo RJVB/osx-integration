@@ -52,7 +52,7 @@
 //
 
 #include <QtWidgets/private/qtwidgetsglobal_p.h>
-#include "QtWidgets/qcombobox.h"
+#include "qcombobox.h"
 
 #include "QtWidgets/qabstractslider.h"
 #include "QtWidgets/qapplication.h"
