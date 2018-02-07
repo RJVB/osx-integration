@@ -1,9 +1,9 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the QtWidgets module of the Qt Toolkit.
+** This file is part of the plugins of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
@@ -37,59 +37,29 @@
 **
 ****************************************************************************/
 
-#include <QtWidgets/private/qtwidgetsglobal_p.h>
-#include <QtCore/qpoint.h>
-#include <QtCore/qstring.h>
-#include <QtGui/qpolygon.h>
-#include <QtCore/qstringbuilder.h>
-#include <QtGui/qaccessible.h>
-
-#ifndef QSTYLEHELPER_P_H
-#define QSTYLEHELPER_P_H
-
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the Qt API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-//
-
-#include <private/qhexstring_p.h>
+#include <QtWidgets/qstyleplugin.h>
+#include "qmacstyle_mac_p.h"
 
 QT_BEGIN_NAMESPACE
 
-class QPainter;
-class QPixmap;
-class QStyleOptionSlider;
-class QStyleOption;
-class QWindow;
-
-namespace QStyleHelper
+class QMacStylePlugin : public QStylePlugin
 {
-    QString uniqueName(const QString &key, const QStyleOption *option, const QSize &size);
-    qreal dpiScaled(qreal value);
-#if QT_CONFIG(dial)
-    qreal angle(const QPointF &p1, const QPointF &p2);
-    QPolygonF calcLines(const QStyleOptionSlider *dial);
-    int calcBigLineSize(int radius);
-    void drawDial(const QStyleOptionSlider *dial, QPainter *painter);
-#endif //QT_CONFIG(dial)
-    void drawBorderPixmap(const QPixmap &pixmap, QPainter *painter, const QRect &rect,
-                     int left = 0, int top = 0, int right = 0,
-                     int bottom = 0);
-#ifndef QT_NO_ACCESSIBILITY
-    bool isInstanceOf(QObject *obj, QAccessible::Role role);
-    bool hasAncestor(QObject *obj, QAccessible::Role role);
-#endif
-    QColor backgroundColor(const QPalette &pal, const QWidget* widget = 0);
-    QWindow *styleObjectWindow(QObject *so);
-}
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QStyleFactoryInterface" FILE "macstyle.json")
+public:
+    QStyle *create(const QString &key);
+};
 
+QStyle *QMacStylePlugin::create(const QString &key)
+{
+    QMacAutoReleasePool pool;
+    if (key.compare(QLatin1String("macintosh"), Qt::CaseInsensitive) == 0)
+        return new QMacStyle();
+
+    return 0;
+}
 
 QT_END_NAMESPACE
 
-#endif // QSTYLEHELPER_P_H
+#include "main.moc"
+

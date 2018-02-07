@@ -63,7 +63,7 @@ QT_BEGIN_NAMESPACE
 class QStringList;
 
 // Private class
-class Q_WIDGETS_EXPORT QCommonStylePrivate : public QStylePrivate
+class QCommonStylePrivate : public QStylePrivate
 {
     Q_DECLARE_PUBLIC(QCommonStyle)
 public:

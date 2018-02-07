@@ -60,7 +60,7 @@ QT_BEGIN_NAMESPACE
 // We mean it.
 //
 
-class Q_WIDGETS_EXPORT QStyleAnimation : public QAbstractAnimation
+class QStyleAnimation : public QAbstractAnimation
 {
     Q_OBJECT
 
@@ -83,8 +83,7 @@ public:
         DefaultFps,
         SixtyFps,
         ThirtyFps,
-        TwentyFps,
-        FifteenFps
+        TwentyFps
     };
 
     FrameRate frameRate() const;
@@ -107,7 +106,7 @@ private:
     int _skip;
 };
 
-class Q_WIDGETS_EXPORT QProgressStyleAnimation : public QStyleAnimation
+class QProgressStyleAnimation : public QStyleAnimation
 {
     Q_OBJECT
 
@@ -128,7 +127,7 @@ private:
     mutable int _step;
 };
 
-class Q_WIDGETS_EXPORT QNumberStyleAnimation : public QStyleAnimation
+class QNumberStyleAnimation : public QStyleAnimation
 {
     Q_OBJECT
 
@@ -152,7 +151,7 @@ private:
     mutable qreal _prev;
 };
 
-class Q_WIDGETS_EXPORT QBlendStyleAnimation : public QStyleAnimation
+class QBlendStyleAnimation : public QStyleAnimation
 {
     Q_OBJECT
 
@@ -179,7 +178,7 @@ private:
     QImage _current;
 };
 
-class Q_WIDGETS_EXPORT QScrollbarStyleAnimation : public QNumberStyleAnimation
+class QScrollbarStyleAnimation : public QNumberStyleAnimation
 {
     Q_OBJECT
 

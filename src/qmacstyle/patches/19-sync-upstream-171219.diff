@@ -1,0 +1,21 @@
+diff --git a/private/qoperatingsystemversion_p.h b/private/qoperatingsystemversion_p.h
+index 78d0daf..77f19d2 100644
+--- a/private/qoperatingsystemversion_p.h
++++ b/private/qoperatingsystemversion_p.h
+@@ -53,16 +53,8 @@
+ 
+ #include "qoperatingsystemversion.h"
+ 
+-#ifdef Q_OS_WIN
+-#include <qt_windows.h>
+-#endif
+-
+ QT_BEGIN_NAMESPACE
+ 
+-#ifdef Q_OS_WIN
+-OSVERSIONINFOEX qWindowsVersionInfo();
+-#endif
+-
+ static inline QOperatingSystemVersion::OSType currentType()
+ {
+ #if defined(Q_OS_WIN)
