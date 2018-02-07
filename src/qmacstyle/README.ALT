@@ -1,1 +1,12 @@
 20180207 : current upstream head: 28cf5ae000de36cd6ad0df942c2f99bfa7e22129 (5.10 branch v5.10.0-391-g28cf5ae000)
+patch: patches/14-merge-qt5100.diff
+
+This merges the cited Qt 5.10 snapshot into my 5.9 QAltMacStyle sources.
+
+Overall it works built against Qt 5.9.3 and Qt 5.8.0 on Mac 10.9.5, with a few caveats:
+- I had to reduce the arrows in the toolbar buttons (PE_IndicatorArrowUp c.s.)
+- vertical scrollbars with a knob act weird
+- animated scrollbars show a cheshiring ghost anchored at the windows TL corner
+- progress bars don't work properly
+
+I'm not yet convinced the style looks better, probably the contrary.
