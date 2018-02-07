@@ -5265,6 +5265,8 @@ int QCommonStyle::styleHint(StyleHint sh, const QStyleOption *opt, const QWidget
         break;
 #endif
     case SH_Widget_Animate:
+    // TODO Qt6: move this code in the SH_Widget_Animation_Duration case
+    // and replace false with 0 and true with 200.
 #if QT_CONFIG(treeview)
         if (qobject_cast<const QTreeView*>(widget)) {
             ret = false;
@@ -5282,6 +5284,12 @@ int QCommonStyle::styleHint(StyleHint sh, const QStyleOption *opt, const QWidget
         ret = QAbstractItemView::ScrollPerItem;
         break;
 #endif
+    case SH_TitleBar_ShowToolTipsOnButtons:
+        ret = true;
+        break;
+    case SH_Widget_Animation_Duration:
+        ret = styleHint(SH_Widget_Animate, opt, widget, hret) ? 200 : 0;
+        break;
     default:
         ret = 0;
         break;
