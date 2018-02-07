@@ -104,7 +104,7 @@
 #include <qsettings.h>
 #include <qvariant.h>
 #include <qpixmapcache.h>
-#include <private/qstyleanimation_p.h>
+#include "qstyleanimation_p.h"
 
 #include <limits.h>
 
@@ -112,7 +112,7 @@
 #   include "private/qtextengine_p.h"
 #endif
 
-#include <private/qstylehelper_p.h>
+#include "qstylehelper_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -5265,6 +5265,8 @@ int QCommonStyle::styleHint(StyleHint sh, const QStyleOption *opt, const QWidget
         break;
 #endif
     case SH_Widget_Animate:
+    // TODO Qt6: move this code in the SH_Widget_Animation_Duration case
+    // and replace false with 0 and true with 200.
 #if QT_CONFIG(treeview)
         if (qobject_cast<const QTreeView*>(widget)) {
             ret = false;
@@ -5280,6 +5282,15 @@ int QCommonStyle::styleHint(StyleHint sh, const QStyleOption *opt, const QWidget
 #if QT_CONFIG(itemviews)
     case SH_ItemView_ScrollMode:
         ret = QAbstractItemView::ScrollPerItem;
+        break;
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+// adding style-private definitions for these hints makes no sense
+    case SH_TitleBar_ShowToolTipsOnButtons:
+        ret = true;
+        break;
+    case SH_Widget_Animation_Duration:
+        ret = styleHint(SH_Widget_Animate, opt, widget, hret) ? 200 : 0;
         break;
 #endif
     default:

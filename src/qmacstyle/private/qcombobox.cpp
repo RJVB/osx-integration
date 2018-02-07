@@ -46,6 +46,7 @@
 #include <qlineedit.h>
 #include <qapplication.h>
 #include <qdesktopwidget.h>
+#include <private/qdesktopwidget_p.h>
 #include <qlistview.h>
 #if QT_CONFIG(tableview)
 #include <qtableview.h>
@@ -67,7 +68,6 @@
 #include <qabstractproxymodel.h>
 #include <qstylehints.h>
 #include <private/qguiapplication_p.h>
-#include <private/qhighdpiscaling_p.h>
 #include <private/qapplication_p.h>
 #include <private/qcombobox_p.h>
 #include <private/qabstractitemmodel_p.h>
@@ -75,11 +75,6 @@
 #include <private/qlineedit_p.h>
 #include <private/qcompleter_p.h>
 #include <qdebug.h>
-#if 0 /* Used to be included in Qt4 for Q_WS_MAC */ && QT_CONFIG(effetcts) && QT_CONFIG(style_mac)
-#include <private/qcore_mac_p.h>
-#include <private/qmacstyle_mac_p.h>
-#include <private/qt_cocoa_helpers_mac_p.h>
-#endif
 #if QT_CONFIG(effects)
 # include <private/qeffects_p.h>
 #endif
@@ -205,7 +200,21 @@ void QComboBoxPrivate::_q_completerActivated(const QModelIndex &index)
     if (index.isValid() && q->completer()) {
         QAbstractProxyModel *proxy = qobject_cast<QAbstractProxyModel *>(q->completer()->completionModel());
         if (proxy) {
-            q->setCurrentIndex(proxy->mapToSource(index).row());
+            const QModelIndex &completerIndex = proxy->mapToSource(index);
+            int row = -1;
+            if (completerIndex.model() == model) {
+                row = completerIndex.row();
+            } else {
+                // if QCompleter uses a proxy model to host widget's one - map again
+                QAbstractProxyModel *completerProxy = qobject_cast<QAbstractProxyModel *>(q->completer()->model());
+                if (completerProxy && completerProxy->sourceModel() == model) {
+                    row = completerProxy->mapToSource(completerIndex).row();
+                } else {
+                    QString match = q->completer()->model()->data(completerIndex).toString();
+                    row = q->findText(match, matchFlags());
+                }
+            }
+            q->setCurrentIndex(row);
             emitActivated(currentIndex);
         }
     }
@@ -257,9 +266,15 @@ QRect QComboBoxPrivate::popupGeometry(int screen) const
     bool useFullScreenForPopupMenu = false;
     if (const QPlatformTheme *theme = QGuiApplicationPrivate::platformTheme())
         useFullScreenForPopupMenu = theme->themeHint(QPlatformTheme::UseFullScreenForPopupMenu).toBool();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    return useFullScreenForPopupMenu ?
+           QDesktopWidgetPrivate::screenGeometry(screen) :
+           QDesktopWidgetPrivate::availableGeometry(screen);
+#else
     return useFullScreenForPopupMenu ?
            QApplication::desktop()->screenGeometry(screen) :
            QApplication::desktop()->availableGeometry(screen);
+#endif
 }
 
 bool QComboBoxPrivate::updateHoverControl(const QPoint &pos)
@@ -420,6 +435,20 @@ void QComboBoxPrivateContainer::resizeEvent(QResizeEvent *e)
     QFrame::resizeEvent(e);
 }
 
+void QComboBoxPrivateContainer::paintEvent(QPaintEvent *e)
+{
+    QStyleOptionComboBox cbOpt = comboStyleOption();
+    if (combo->style()->styleHint(QStyle::SH_ComboBox_Popup, &cbOpt, combo)
+            && mask().isEmpty()) {
+        QStyleOption opt;
+        opt.initFrom(this);
+        QPainter p(this);
+        style()->drawPrimitive(QStyle::PE_PanelMenu, &opt, &p, this);
+    }
+
+    QFrame::paintEvent(e);
+}
+
 void QComboBoxPrivateContainer::leaveEvent(QEvent *)
 {
 // On Mac using the Mac style we want to clear the selection
@@ -487,6 +516,14 @@ void QComboBoxPrivateContainer::scrollItemView(int action)
     if (view->verticalScrollBar())
         view->verticalScrollBar()->triggerAction(static_cast<QAbstractSlider::SliderAction>(action));
 #endif
+}
+
+void QComboBoxPrivateContainer::hideScrollers()
+{
+    if (top)
+        top->hide();
+    if (bottom)
+        bottom->hide();
 }
 
 /*
@@ -2554,8 +2591,7 @@ bool QComboBoxPrivate::showNativePopup()
     else if (q->testAttribute(Qt::WA_MacMiniSize))
         offset = QPoint(-2, 6);
 
-    const QRect targetRect = QRect(tlw->mapFromGlobal(q->mapToGlobal(offset)), QSize());
-    m_platformMenu->showPopup(tlw, QHighDpi::toNativePixels(targetRect, tlw), currentItem);
+    m_platformMenu->showPopup(tlw, QRect(tlw->mapFromGlobal(q->mapToGlobal(offset)), QSize()), currentItem);
 
 #ifdef Q_OS_OSX
     // The Cocoa popup will swallow any mouse release event.
@@ -2617,7 +2653,11 @@ void QComboBox::showPopup()
     QComboBoxPrivateContainer* container = d->viewContainer();
     QRect listRect(style->subControlRect(QStyle::CC_ComboBox, &opt,
                                          QStyle::SC_ComboBoxListBoxPopup, this));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    QRect screen = d->popupGeometry(QDesktopWidgetPrivate::screenNumber(this));
+#else
     QRect screen = d->popupGeometry(QApplication::desktop()->screenNumber(this));
+#endif
 
     QPoint below = mapToGlobal(listRect.bottomLeft());
     int belowHeight = screen.bottom() - below.y();
@@ -2752,6 +2792,11 @@ void QComboBox::showPopup()
     if (needHorizontalScrollBar) {
         listRect.adjust(0, 0, 0, sb->height());
     }
+
+    // Hide the scrollers here, so that the listrect gets the full height of the container
+    // If the scrollers are truly needed, the later call to container->updateScrollers()
+    // will make them visible again.
+    container->hideScrollers();
     container->setGeometry(listRect);
 
 #ifndef Q_OS_MAC

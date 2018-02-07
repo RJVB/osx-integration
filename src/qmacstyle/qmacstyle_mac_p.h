@@ -57,9 +57,6 @@
 
 QT_BEGIN_NAMESPACE
 
-
-#if QT_CONFIG(style_mac)
-
 class QPalette;
 
 class QPushButton;
@@ -101,12 +98,6 @@ public:
     virtual int styleHint(StyleHint sh, const QStyleOption *opt = 0, const QWidget *w = 0,
                           QStyleHintReturn *shret = 0) const;
 
-    enum WidgetSizePolicy { SizeSmall, SizeLarge, SizeMini, SizeDefault
-    };
-
-    static void setWidgetSizePolicy(const QWidget *w, WidgetSizePolicy policy);
-    static WidgetSizePolicy widgetSizePolicy(const QWidget *w, const QStyleOption *opt = 0);
-
     QPixmap standardPixmap(StandardPixmap sp, const QStyleOption *opt,
                            const QWidget *widget = 0) const;
 
@@ -127,13 +118,7 @@ public:
 private:
     Q_DISABLE_COPY(QMacStyle)
     Q_DECLARE_PRIVATE(QMacStyle)
-
-#if QT_CONFIG(pushbutton)
-    friend bool qt_mac_buttonIsRenderedFlat(const QPushButton *pushButton, const QStyleOptionButton *option);
-#endif
 };
-
-#endif
 
 QT_END_NAMESPACE
 

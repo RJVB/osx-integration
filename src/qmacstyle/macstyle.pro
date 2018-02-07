@@ -14,7 +14,7 @@ HEADERS += \
 
 include(private/private.pri)
 
-LIBS_PRIVATE += -framework AppKit -framework Carbon
+LIBS_PRIVATE += -framework ApplicationServices -framework AppKit -framework Carbon
 
 DISTFILES += macstyle.json
 
