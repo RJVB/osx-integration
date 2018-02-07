@@ -3666,6 +3666,7 @@ void QMacStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, QPai
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
             // QTabBarPrivate exists but is not exported in Qt 5.9
             const QTabBarPrivate *tabBarPrivate = static_cast<QTabBarPrivate *>(QObjectPrivate::get(tabBar));
+            const int hoveredTabIndex = tabBarPrivate->hoveredTabIndex();
             if (!documentMode ||
                 (hoveredTabIndex != -1 && ((w == tabBar->tabButton(hoveredTabIndex, QTabBar::LeftSide)) ||
                                            (w == tabBar->tabButton(hoveredTabIndex, QTabBar::RightSide)))))
