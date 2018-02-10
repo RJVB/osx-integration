@@ -726,9 +726,9 @@ void QCocoaWindow::setWindowIcon(const QIcon &icon)
     NSButton *iconButton = [m_view.window standardWindowButton:NSWindowDocumentIconButton];
     if (!iconButton) {
         // Window icons are only supported on macOS in combination with a document filePath
-        // RJVB: TODO: revert, so (KDE) dialogs, tool windows etc can also sport an icon
-        // (=> return only if icon.isNull())
-        return;
+        // RJVB: reverted, so (KDE) dialogs, tool windows etc can also sport an icon
+        if (icon.isNull())
+            return;
     }
 
     QMacAutoReleasePool pool;
