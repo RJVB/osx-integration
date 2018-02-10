@@ -33,19 +33,20 @@ a Qt patch (or a dedicated event handler) to do anything useful though.
   file dialogs.
 
 This component should still build against Qt 5.5.x; the other components need at
-least Qt 5.8 .
+least Qt 5.9 .
+* See the README.ALT files in the qmacstyle and qcocoa-qpa directories!! *
 
 ### QMacStyle
-A modified fork of the native macintosh style from Qt 5.9 (git) which doesn't
+A modified fork of the native macintosh style from Qt 5.10 (git) which doesn't
 impose the Mac standard font for QComboBox menu items and provides support
 for named menu sections in context menus and menus attached to a "non-native"
-menubar. Also builds against Qt 5.8.0 .
+menubar. Also builds against Qt 5.9.x .
 A standalone build of this component can be done using the provided QMake file
 (qmacstyle/macstyle.pro).
 
 ### QCocoaQPA
 A modified fork of the Cocoa platform plugin from Qt 5.9 (git; builds against Qt
-5.8.0) which provides support for named menu sections under the native menubar
+5.9.x) which provides support for named menu sections under the native menubar
 and also reintroduces a basic fullscreen mode that works consistently across
 Mission Control settings and platforms - i.e. it never blackens out other
 attached monitors but keeps their content visible and accessible. It's also a
