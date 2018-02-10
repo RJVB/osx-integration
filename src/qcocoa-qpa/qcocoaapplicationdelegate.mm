@@ -84,6 +84,10 @@
 #include "qt_mac_p.h"
 #include <qpa/qwindowsysteminterface.h>
 
+#ifndef __has_builtin
+#   define __has_builtin(x) false
+#endif
+
 QT_USE_NAMESPACE
 
 QT_BEGIN_NAMESPACE
@@ -284,7 +288,12 @@ QT_END_NAMESPACE
     inLaunch = false;
 
     if (qEnvironmentVariableIsEmpty("QT_MAC_DISABLE_FOREGROUND_APPLICATION_TRANSFORM")) {
+#if __has_builtin(__builtin_available)
+        if (__builtin_available(macOS 10.12, *))
+#else
         if (QSysInfo::macVersion() >= QSysInfo::MV_10_12) {
+#endif
+        {
             // Move the application window to front to avoid launching behind the terminal.
             // Ignoring other apps is necessary (we must ignore the terminal), but makes
             // Qt apps play slightly less nice with other apps when lanching from Finder

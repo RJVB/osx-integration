@@ -62,60 +62,11 @@
 
 QT_BEGIN_NAMESPACE
 
-class QCocoaScreen : public QPlatformScreen
+class QCocoaScreen;
+
+class QCocoaIntegration : public QObject, public QPlatformIntegration
 {
-public:
-    QCocoaScreen(int screenIndex);
-    ~QCocoaScreen();
-
-    // ----------------------------------------------------
-    // Virtual methods overridden from QPlatformScreen
-    QPixmap grabWindow(WId window, int x, int y, int width, int height) const Q_DECL_OVERRIDE;
-    QRect geometry() const Q_DECL_OVERRIDE { return m_geometry; }
-    QRect availableGeometry() const Q_DECL_OVERRIDE { return m_availableGeometry; }
-    int depth() const Q_DECL_OVERRIDE { return m_depth; }
-    QImage::Format format() const Q_DECL_OVERRIDE { return m_format; }
-    qreal devicePixelRatio() const Q_DECL_OVERRIDE;
-    QSizeF physicalSize() const Q_DECL_OVERRIDE { return m_physicalSize; }
-    QDpi logicalDpi() const Q_DECL_OVERRIDE { return m_logicalDpi; }
-    qreal refreshRate() const Q_DECL_OVERRIDE { return m_refreshRate; }
-    QString name() const Q_DECL_OVERRIDE { return m_name; }
-    QPlatformCursor *cursor() const Q_DECL_OVERRIDE { return m_cursor; }
-    QWindow *topLevelAt(const QPoint &point) const Q_DECL_OVERRIDE;
-    QList<QPlatformScreen *> virtualSiblings() const Q_DECL_OVERRIDE { return m_siblings; }
-    QPlatformScreen::SubpixelAntialiasingType subpixelAntialiasingTypeHint() const Q_DECL_OVERRIDE;
-
-    // ----------------------------------------------------
-    // Additional methods
-    void setVirtualSiblings(const QList<QPlatformScreen *> &siblings) { m_siblings = siblings; }
-    NSScreen *nativeScreen() const;
-    void updateGeometry();
-
-    QPointF mapToNative(const QPointF &pos) const { return flipCoordinate(pos); }
-    QRectF mapToNative(const QRectF &rect) const { return flipCoordinate(rect); }
-    QPointF mapFromNative(const QPointF &pos) const { return flipCoordinate(pos); }
-    QRectF mapFromNative(const QRectF &rect) const { return flipCoordinate(rect); }
-
-private:
-    QPointF flipCoordinate(const QPointF &pos) const;
-    QRectF flipCoordinate(const QRectF &rect) const;
-
-public:
-    int m_screenIndex;
-    QRect m_geometry;
-    QRect m_availableGeometry;
-    QDpi m_logicalDpi;
-    qreal m_refreshRate;
-    int m_depth;
-    QString m_name;
-    QImage::Format m_format;
-    QSizeF m_physicalSize;
-    QCocoaCursor *m_cursor;
-    QList<QPlatformScreen *> m_siblings;
-};
-
-class QCocoaIntegration : public QPlatformIntegration
-{
+    Q_OBJECT
 public:
     enum Option {
         UseFreeTypeFontEngine = 0x1,
@@ -131,7 +82,8 @@ public:
 
     bool hasCapability(QPlatformIntegration::Capability cap) const Q_DECL_OVERRIDE;
     QPlatformWindow *createPlatformWindow(QWindow *window) const Q_DECL_OVERRIDE;
-    QPlatformWindow *createForeignWindow(QWindow *window, WId nativeHandle) const Q_DECL_MAYBE_OVERRIDE;
+    QPlatformWindow *createForeignWindow(QWindow *window, WId nativeHandle) const Q_DECL_MAYBE_OVERRIDE_58;
+    QPlatformOffscreenSurface *createPlatformOffscreenSurface(QOffscreenSurface *surface) const override;
 #ifndef QT_NO_OPENGL
     QPlatformOpenGLContext *createPlatformOpenGLContext(QOpenGLContext *context) const Q_DECL_OVERRIDE;
 #endif
@@ -178,6 +130,9 @@ public:
     bool fontConfigFontEngine(bool enabled);
     bool mCanReplaceFontDatabase;
     qreal m_fontSmoothingGamma;
+
+private Q_SLOTS:
+    void focusWindowChanged(QWindow *);
 
 private:
     static QCocoaIntegration *mInstance;

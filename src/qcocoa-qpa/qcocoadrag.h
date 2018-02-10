@@ -55,7 +55,13 @@ public:
     QCocoaDrag();
     ~QCocoaDrag();
 
-    QMimeData *platformDropData() Q_DECL_OVERRIDE;
+    QMimeData *dragMimeData();
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+    inline QMimeData *platformDropData() Q_DECL_OVERRIDE
+    {
+        return dragMimeData();
+    }
+#endif
     Qt::DropAction drag(QDrag *m_drag) Q_DECL_OVERRIDE;
 
     Qt::DropAction defaultAction(Qt::DropActions possibleActions,

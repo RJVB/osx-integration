@@ -86,7 +86,6 @@
 #include <qdebug.h>
 
 #include <AppKit/AppKit.h>
-#include <Carbon/Carbon.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -285,7 +284,7 @@ bool QCocoaEventDispatcher::hasPendingEvents()
 {
     extern uint qGlobalPostedEventsCount();
     extern bool qt_is_gui_used; //qapplication.cpp
-    return qGlobalPostedEventsCount() || (qt_is_gui_used && GetNumEventsInQueue(GetMainEventQueue()));
+    return qGlobalPostedEventsCount() || (qt_is_gui_used && !CFRunLoopIsWaiting(CFRunLoopGetMain()));
 }
 
 static bool IsMouseOrKeyEvent( NSEvent* event )
@@ -897,21 +896,6 @@ void QCocoaEventDispatcherPrivate::processPostedEvents()
         lastSerial = serial;
         QCoreApplication::sendPostedEvents();
         QWindowSystemInterface::sendWindowSystemEvents(QEventLoop::AllEvents);
-    }
-}
-
-void QCocoaEventDispatcherPrivate::removeQueuedUserInputEvents(int nsWinNumber)
-{
-    if (nsWinNumber) {
-        int eventIndex = queuedUserInputEvents.size();
-
-        while (--eventIndex >= 0) {
-            NSEvent * nsevent = static_cast<NSEvent *>(queuedUserInputEvents.at(eventIndex));
-            if ([nsevent windowNumber] == nsWinNumber) {
-                queuedUserInputEvents.removeAt(eventIndex);
-                [nsevent release];
-            }
-        }
     }
 }
 

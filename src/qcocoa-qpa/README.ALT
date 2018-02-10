@@ -1,0 +1,9 @@
+20180207 : current upstream head: 28cf5ae000de36cd6ad0df942c2f99bfa7e22129 (5.10 branch v5.10.0-391-g28cf5ae000)
+patch: patches/30-merge-qt5100.diff
+
+This merges the cited Qt 5.10 snapshot into my 5.9 QAltCocoa sources.
+
+Overall it works built against Qt 5.9.3 (NOT Qt 5.8.0 at the moment) on Mac 10.9.5, with a few caveats:
+- certain colours look off with the native widget style (darkish background; hardcoded Aqua/blue theme colours?)
+- popup/context/non-native-menubar menus do not move properly with the parent window
+- popup menu rounded corners show artefacts -> shader/compositor issue?

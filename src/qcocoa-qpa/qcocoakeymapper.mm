@@ -72,14 +72,6 @@ static const Qt::KeyboardModifiers ModsTbl[] = {
 
 bool qt_mac_eat_unicode_key = false;
 
-Q_GUI_EXPORT void qt_mac_secure_keyboard(bool b)
-{
-    static bool secure = false;
-    if (b != secure){
-        b ? EnableSecureEventInput() : DisableSecureEventInput();
-        secure = b;
-    }
-}
 
 /* key maps */
 struct qt_mac_enum_mapper
@@ -397,18 +389,7 @@ bool QCocoaKeyMapper::updateKeyboard()
     }
     currentInputSource = source;
     keyboard_dead = 0;
-    CFStringRef iso639Code;
 
-    CFArrayRef array = static_cast<CFArrayRef>(TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceLanguages));
-    iso639Code = static_cast<CFStringRef>(CFArrayGetValueAtIndex(array, 0)); // Actually a RFC3066bis, but it's close enough
-
-    if (iso639Code) {
-        keyboardInputLocale = QLocale(QString::fromCFString(iso639Code));
-        keyboardInputDirection = keyboardInputLocale.textDirection();
-    } else {
-        keyboardInputLocale = QLocale::c();
-        keyboardInputDirection = Qt::LeftToRight;
-    }
     return true;
 }
 

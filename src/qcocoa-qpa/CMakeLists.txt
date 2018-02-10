@@ -42,10 +42,12 @@ if(Qt5_FOUND AND (NOT ${Qt5_VERSION} VERSION_LESS ${QT_REAL_MIN_VERSION}))
 
         set(qaltcocoa_SRCS main.mm 
             qcocoaintegration.mm 
+            qcocoascreen.mm
             qcocoatheme.mm 
             qcocoabackingstore.mm 
             qcocoawindow.mm 
             qnsview.mm 
+            qnswindow.mm
             qnsviewaccessibility.mm 
             qnswindowdelegate.mm 
             qcocoanativeinterface.mm 
@@ -111,7 +113,7 @@ if(Qt5_FOUND AND (NOT ${Qt5_VERSION} VERSION_LESS ${QT_REAL_MIN_VERSION}))
             ${QT_FRAMEWORKS_DIR}/libQt5AccessibilitySupport.a
             ${FONTCONFIG_LIBRARIES} ${FREETYPE_LIBRARIES}
             "-framework OpenGL -framework AGL"
-            "-framework AppKit -framework Carbon -framework IOKit -lcups")
+            "-framework AppKit -framework Carbon -framework IOKit -framework QuartzCore -lcups")
         install(TARGETS qaltcocoa DESTINATION ${KDE_INSTALL_QTPLUGINDIR}/platforms)
     else()
         # Generate a .qmake.cache file that coerce qmake to build more like we're building ourselves

@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2016 The Qt Company Ltd.
-** Copyright (C) 2012 Klar√§lvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author James Turner <james.turner@kdab.com>
+** Copyright (C) 2012 Klar‰lvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author James Turner <james.turner@kdab.com>
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the plugins of the Qt Toolkit.
@@ -78,11 +78,12 @@ public:
     QCocoaMenuItem();
     ~QCocoaMenuItem();
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     void setTag(quintptr tag) Q_DECL_OVERRIDE
         { m_tag = tag; }
     quintptr tag() const Q_DECL_OVERRIDE
         { return m_tag; }
-
+#endif
     void setText(const QString &text) Q_DECL_OVERRIDE;
     void setIcon(const QIcon &icon) Q_DECL_OVERRIDE;
     void setMenu(QPlatformMenu *menu) Q_DECL_OVERRIDE;
@@ -129,7 +130,9 @@ private:
 #ifndef QT_NO_SHORTCUT
     QKeySequence m_shortcut;
 #endif
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     quintptr m_tag;
+#endif
     int m_iconSize;
     bool m_textSynced:1;
     bool m_isVisible:1;

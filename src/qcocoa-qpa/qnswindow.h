@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the plugins of the Qt Toolkit.
@@ -37,58 +37,46 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the Qt API.  It exists for the convenience
-// of other Qt classes.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-//
+#ifndef QNSWINDOW_H
+#define QNSWINDOW_H
 
-#ifndef QMULTITOUCH_MAC_P_H
-#define QMULTITOUCH_MAC_P_H
+#include <qglobal.h>
+#include <QPointer>
+#include "qt_mac_p.h"
 
-#include <QtCore/qglobal.h>
+#include <AppKit/AppKit.h>
 
-#import <AppKit/AppKit.h>
+QT_FORWARD_DECLARE_CLASS(QCocoaWindow)
 
-#include <qpa/qwindowsysteminterface.h>
-#include <qhash.h>
-#include <QtCore>
+// @compatibility_alias doesn't work with categories or their methods
+#define FullScreenProperty QT_MANGLE_NAMESPACE(FullScreenProperty)
+#define qt_fullScreen QT_MANGLE_NAMESPACE(qt_fullScreen)
 
-QT_BEGIN_NAMESPACE
+@interface NSWindow (FullScreenProperty)
+@property(readonly) BOOL qt_fullScreen;
+@end
 
-class QCocoaTouch
-{
-    public:
-        static QList<QWindowSystemInterface::TouchPoint> getCurrentTouchPointList(NSEvent *event, bool acceptSingleTouch);
-        static void setMouseInDraggingState(bool inDraggingState);
-        static QTouchDevice *getTouchDevice(QTouchDevice::DeviceType type, quint64 id);
+// @compatibility_alias doesn't work with protocols
+#define QNSWindowProtocol QT_MANGLE_NAMESPACE(QNSWindowProtocol)
 
-    private:
-        static QHash<quint64, QTouchDevice*> _touchDevices;
-        static QHash<qint64, QCocoaTouch*> _currentTouches;
-        static QPointF _screenReferencePos;
-        static QPointF _trackpadReferencePos;
-        static int _idAssignmentCount;
-        static int _touchCount;
-        static bool _updateInternalStateOnly;
+@protocol QNSWindowProtocol
+@optional
+- (BOOL)canBecomeKeyWindow;
+- (void)sendEvent:(NSEvent*)theEvent;
+- (void)closeAndRelease;
+- (void)release;
+- (void)dealloc;
+- (BOOL)isOpaque;
+- (NSColor *)backgroundColor;
+@property (nonatomic, readonly) QCocoaWindow *platformWindow;
+@end
 
-        QWindowSystemInterface::TouchPoint _touchPoint;
-        qint64 _identity;
+typedef NSWindow<QNSWindowProtocol> QCocoaNSWindow;
 
-        QCocoaTouch(NSTouch *nstouch);
-        ~QCocoaTouch();
+@interface QT_MANGLE_NAMESPACE(QNSWindow) : NSWindow<QNSWindowProtocol> @end
+QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSWindow);
 
-        void updateTouchData(NSTouch *nstouch, NSTouchPhase phase);
-        static QCocoaTouch *findQCocoaTouch(NSTouch *nstouch);
-        static Qt::TouchPointState toTouchPointState(NSTouchPhase nsState);
-};
+@interface QT_MANGLE_NAMESPACE(QNSPanel) : NSPanel<QNSWindowProtocol> @end
+QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSPanel);
 
-QT_END_NAMESPACE
-
-#endif // QMULTITOUCH_MAC_P_H
-
+#endif // QNSWINDOW_H

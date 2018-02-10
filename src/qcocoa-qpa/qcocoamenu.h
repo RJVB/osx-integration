@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2016 The Qt Company Ltd.
-** Copyright (C) 2012 Klar√§lvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author James Turner <james.turner@kdab.com>
+** Copyright (C) 2012 Klar‰lvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author James Turner <james.turner@kdab.com>
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the plugins of the Qt Toolkit.
@@ -55,11 +55,12 @@ public:
     QCocoaMenu();
     ~QCocoaMenu();
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     void setTag(quintptr tag) Q_DECL_OVERRIDE
     { m_tag = tag; }
     quintptr tag() const Q_DECL_OVERRIDE
     { return m_tag; }
-
+#endif
     void insertMenuItem(QPlatformMenuItem *menuItem, QPlatformMenuItem *before) Q_DECL_OVERRIDE;
     void removeMenuItem(QPlatformMenuItem *menuItem) Q_DECL_OVERRIDE;
     void syncMenuItem(QPlatformMenuItem *menuItem) Q_DECL_OVERRIDE;
@@ -108,7 +109,9 @@ private:
     QList<QCocoaMenuItem *> m_menuItems;
     NSMenu *m_nativeMenu;
     NSMenuItem *m_attachedItem;
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     quintptr m_tag;
+#endif
     int m_updateTimer;
     bool m_enabled:1;
     bool m_parentEnabled:1;

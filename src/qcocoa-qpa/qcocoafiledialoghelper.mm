@@ -167,7 +167,7 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSOpenSavePanelDelegate);
     [mSavePanel setDelegate:self];
 
 #if QT_OSX_PLATFORM_SDK_EQUAL_OR_ABOVE(__MAC_10_11)
-    if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::OSXElCapitan)
+    if (__builtin_available(macOS 10.11, *))
         mOpenPanel.accessoryViewDisclosed = YES;
 #endif
 
@@ -235,7 +235,7 @@ static QString strippedText(QString s)
         [mOpenPanel beginWithCompletionHandler:^(NSInteger result){
             mReturnCode = result;
             if (mHelper)
-                mHelper->QNSOpenSavePanelDelegate_panelClosed(result == NSOKButton);
+                mHelper->QNSOpenSavePanelDelegate_panelClosed(result == NSModalResponseOK);
         }];
     }
 }
@@ -264,12 +264,12 @@ static QString strippedText(QString s)
     QCocoaMenuBar::resetKnownMenuItemsToQt();
 
     QAbstractEventDispatcher::instance()->interrupt();
-    return (mReturnCode == NSOKButton);
+    return (mReturnCode == NSModalResponseOK);
 }
 
 - (QPlatformDialogHelper::DialogCode)dialogResultCode
 {
-    return (mReturnCode == NSOKButton) ? QPlatformDialogHelper::Accepted : QPlatformDialogHelper::Rejected;
+    return (mReturnCode == NSModalResponseOK) ? QPlatformDialogHelper::Accepted : QPlatformDialogHelper::Rejected;
 }
 
 - (void)showWindowModalSheet:(QWindow *)parent
@@ -290,7 +290,7 @@ static QString strippedText(QString s)
     [mSavePanel beginSheetModalForWindow:nsparent completionHandler:^(NSInteger result){
         mReturnCode = result;
         if (mHelper)
-            mHelper->QNSOpenSavePanelDelegate_panelClosed(result == NSOKButton);
+            mHelper->QNSOpenSavePanelDelegate_panelClosed(result == NSModalResponseOK);
     }];
 }
 

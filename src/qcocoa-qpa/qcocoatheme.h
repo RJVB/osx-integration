@@ -43,11 +43,19 @@
 #include <QtCore/QHash>
 #include <qpa/qplatformtheme.h>
 
-#ifndef Q_DECL_MAYBE_OVERRIDE
-#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
-#define Q_DECL_MAYBE_OVERRIDE   Q_DECL_OVERRIDE
+#ifndef Q_DECL_MAYBE_OVERRIDE_59
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+#define Q_DECL_MAYBE_OVERRIDE_59    Q_DECL_OVERRIDE
 #else
-#define Q_DECL_MAYBE_OVERRIDE   /**/
+#define Q_DECL_MAYBE_OVERRIDE_59    /**/
+#endif
+#endif
+
+#ifndef Q_DECL_MAYBE_OVERRIDE_58
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+#define Q_DECL_MAYBE_OVERRIDE_58    Q_DECL_OVERRIDE
+#else
+#define Q_DECL_MAYBE_OVERRIDE_58    /**/
 #endif
 #endif
 
@@ -82,7 +90,7 @@ public:
 
     QVariant themeHint(ThemeHint hint) const Q_DECL_OVERRIDE;
     QString standardButtonText(int button) const Q_DECL_OVERRIDE;
-    QKeySequence standardButtonShortcut(int button) const Q_DECL_MAYBE_OVERRIDE;
+    QKeySequence standardButtonShortcut(int button) const Q_DECL_MAYBE_OVERRIDE_58;
 
     static const char *name;
 
