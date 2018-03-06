@@ -46,6 +46,7 @@
 #include "qcocoahelpers.h"
 #include "qcocoanativeinterface.h"
 #include "qnsview.h"
+#include "qcocoamenuloader.h"
 #include <QtCore/qfileinfo.h>
 #include <QtCore/private/qcore_mac_p.h>
 #include <qwindow.h>
@@ -1147,7 +1148,12 @@ void QCocoaWindow::setWindowTitle(const QString &title)
         return;
 
     CFStringRef windowTitle = title.toCFString();
-    [m_nsWindow setTitle: const_cast<NSString *>(reinterpret_cast<const NSString *>(windowTitle))];
+    NSString *nsTitle = const_cast<NSString *>(reinterpret_cast<const NSString *>(windowTitle));
+    [m_nsWindow setTitle: nsTitle];
+//     if (![NSApp windowsMenu]) {
+//         [NSApp setWindowsMenu:[[QCocoaMenuLoader sharedMenuLoader] applicationMenu]];
+//     }
+//     [NSApp changeWindowsItem:m_nsWindow title:nsTitle filename:NO];
     CFRelease(windowTitle);
 }
 
