@@ -52,7 +52,8 @@ enum {
     ShowAllAppMenuItem,
     PreferencesAppMenuItem,
     QuitAppMenuItem,
-    AboutAppMenuItem
+    AboutAppMenuItem,
+    WindowsAppMenuItem
 };
 
 

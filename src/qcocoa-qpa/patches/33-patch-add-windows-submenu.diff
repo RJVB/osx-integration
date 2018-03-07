@@ -1,0 +1,135 @@
+commit 18a7a958d2aa5ca70d17cfed20c720b28fac3bca
+Author: R.J.V. Bertin <rjvbertin@gmail.com>
+Date:   Wed Mar 7 18:25:13 2018 +0100
+
+    QAltCocoa : a more functional PoC implementation of a Window menu feature
+    
+    This variant adds a "Windows" (sic) submenu to the Application menu,
+    visible only when the application has created NSWindow instances. No
+    attempt is made to manage the content, the OS will take care of this.
+    
+    Committed from host : Portia.local
+
+diff --git a/src/qcocoa-qpa/messages.cpp b/src/qcocoa-qpa/messages.cpp
+index cda89d3..6d15031 100644
+--- a/src/qcocoa-qpa/messages.cpp
++++ b/src/qcocoa-qpa/messages.cpp
+@@ -58,7 +58,8 @@ static const char *application_menu_strings[] =
+     QT_TRANSLATE_NOOP("MAC_APPLICATION_MENU","Show All"),
+     QT_TRANSLATE_NOOP("MAC_APPLICATION_MENU","Preferences..."),
+     QT_TRANSLATE_NOOP("MAC_APPLICATION_MENU","Quit %1"),
+-    QT_TRANSLATE_NOOP("MAC_APPLICATION_MENU","About %1")
++    QT_TRANSLATE_NOOP("MAC_APPLICATION_MENU","About %1"),
++    QT_TRANSLATE_NOOP("MAC_APPLICATION_MENU","Windows")
+ };
+ 
+ QString qt_mac_applicationmenu_string(int type)
+diff --git a/src/qcocoa-qpa/messages.h b/src/qcocoa-qpa/messages.h
+index e41898f..8c79d2a 100644
+--- a/src/qcocoa-qpa/messages.h
++++ b/src/qcocoa-qpa/messages.h
+@@ -52,7 +52,8 @@ enum {
+     ShowAllAppMenuItem,
+     PreferencesAppMenuItem,
+     QuitAppMenuItem,
+-    AboutAppMenuItem
++    AboutAppMenuItem,
++    WindowsAppMenuItem
+ };
+ 
+ 
+diff --git a/src/qcocoa-qpa/qcocoamenuloader.h b/src/qcocoa-qpa/qcocoamenuloader.h
+index 95f3476..11abccf 100644
+--- a/src/qcocoa-qpa/qcocoamenuloader.h
++++ b/src/qcocoa-qpa/qcocoamenuloader.h
+@@ -65,6 +65,7 @@
+     IBOutlet NSMenuItem *hideItem;
+     NSMenuItem *lastAppSpecificItem;
+     NSMenuItem *servicesItem;
++    NSMenuItem *windowsItem;
+     NSMenuItem *hideAllOthersItem;
+     NSMenuItem *showAllItem;
+ }
+@@ -90,6 +91,7 @@
+ - (BOOL)validateMenuItem:(NSMenuItem*)menuItem;
+ - (void)qtTranslateApplicationMenu;
+ - (NSArray *)mergeable;
++- (void)enableWindowsMenu:(BOOL)enabled;
+ @end
+ 
+ QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuLoader);
+diff --git a/src/qcocoa-qpa/qcocoamenuloader.mm b/src/qcocoa-qpa/qcocoamenuloader.mm
+index b986833..9a11957 100644
+--- a/src/qcocoa-qpa/qcocoamenuloader.mm
++++ b/src/qcocoa-qpa/qcocoamenuloader.mm
+@@ -120,6 +120,16 @@
+ 
+         [appMenu addItem:[NSMenuItem separatorItem]];
+ 
++        windowsItem = [[NSMenuItem alloc] init];
++        windowsItem.title = @"Windows";
++        NSMenu *windowsMenu = [[[NSMenu alloc] initWithTitle:@"Windows"] autorelease];
++        windowsItem.submenu = windowsMenu;
++        [NSApplication sharedApplication].windowsMenu = windowsMenu;
++        [self enableWindowsMenu:NO];
++        [appMenu addItem:windowsItem];
++
++        [appMenu addItem:[NSMenuItem separatorItem]];
++
+         // Hide Application
+         hideItem = [[NSMenuItem alloc] initWithTitle:[@"Hide " stringByAppendingString:appName]
+                                               action:@selector(hide:)
+@@ -163,6 +173,7 @@
+     [aboutQtItem release];
+     [preferencesItem release];
+     [servicesItem release];
++    [windowsItem release];
+     [hideItem release];
+     [hideAllOthersItem release];
+     [showAllItem release];
+@@ -316,6 +327,7 @@
+     [preferencesItem setTitle:qt_mac_applicationmenu_string(PreferencesAppMenuItem).toNSString()];
+     [quitItem setTitle:qt_mac_applicationmenu_string(QuitAppMenuItem).arg(qt_mac_applicationName()).toNSString()];
+     [aboutItem setTitle:qt_mac_applicationmenu_string(AboutAppMenuItem).arg(qt_mac_applicationName()).toNSString()];
++    [windowsItem setTitle:qt_mac_applicationmenu_string(WindowsAppMenuItem).toNSString()];
+ #endif
+ }
+ 
+@@ -365,4 +377,15 @@
+     return [NSArray arrayWithObjects:preferencesItem, aboutItem, aboutQtItem, lastAppSpecificItem, nil];
+ }
+ 
++- (void) enableWindowsMenu:(BOOL)enabled
++{
++    if (enabled) {
++        windowsItem.enabled = YES;
++        windowsItem.hidden = NO;
++    } else {
++        windowsItem.enabled = NO;
++        windowsItem.hidden = YES;
++    }
++}
++
+ @end
+diff --git a/src/qcocoa-qpa/qcocoawindow.mm b/src/qcocoa-qpa/qcocoawindow.mm
+index 30089ab..d653b69 100644
+--- a/src/qcocoa-qpa/qcocoawindow.mm
++++ b/src/qcocoa-qpa/qcocoawindow.mm
+@@ -46,6 +46,7 @@
+ #include "qcocoahelpers.h"
+ #include "qcocoanativeinterface.h"
+ #include "qnsview.h"
++#include "qcocoamenuloader.h"
+ #include <QtCore/qfileinfo.h>
+ #include <QtCore/private/qcore_mac_p.h>
+ #include <qwindow.h>
+@@ -1878,6 +1879,9 @@ QCocoaNSWindow *QCocoaWindow::createNSWindow(bool shouldBeChildNSWindow, bool sh
+ 
+     // Create NSWindow
+     Class windowClass = shouldBePanel ? [QNSPanel class] : [QNSWindow class];
++    if (!shouldBePanel) {
++        [[QCocoaMenuLoader sharedMenuLoader] enableWindowsMenu:YES];
++    }
+     NSUInteger styleMask = shouldBeChildNSWindow ? NSBorderlessWindowMask : windowStyleMask(flags);
+     QCocoaNSWindow *window = [[windowClass alloc] initWithContentRect:frame
+         screen:cocoaScreen->nativeScreen() styleMask:styleMask qPlatformWindow:this];

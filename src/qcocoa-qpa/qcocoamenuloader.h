@@ -65,6 +65,7 @@
     IBOutlet NSMenuItem *hideItem;
     NSMenuItem *lastAppSpecificItem;
     NSMenuItem *servicesItem;
+    NSMenuItem *windowsItem;
     NSMenuItem *hideAllOthersItem;
     NSMenuItem *showAllItem;
 }
@@ -90,6 +91,7 @@
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem;
 - (void)qtTranslateApplicationMenu;
 - (NSArray *)mergeable;
+- (void)enableWindowsMenu:(BOOL)enabled;
 @end
 
 QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuLoader);

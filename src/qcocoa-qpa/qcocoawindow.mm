@@ -46,6 +46,7 @@
 #include "qcocoahelpers.h"
 #include "qcocoanativeinterface.h"
 #include "qnsview.h"
+#include "qcocoamenuloader.h"
 #include <QtCore/qfileinfo.h>
 #include <QtCore/private/qcore_mac_p.h>
 #include <qwindow.h>
@@ -1878,6 +1879,9 @@ QCocoaNSWindow *QCocoaWindow::createNSWindow(bool shouldBeChildNSWindow, bool sh
 
     // Create NSWindow
     Class windowClass = shouldBePanel ? [QNSPanel class] : [QNSWindow class];
+    if (!shouldBePanel) {
+        [[QCocoaMenuLoader sharedMenuLoader] enableWindowsMenu:YES];
+    }
     NSUInteger styleMask = shouldBeChildNSWindow ? NSBorderlessWindowMask : windowStyleMask(flags);
     QCocoaNSWindow *window = [[windowClass alloc] initWithContentRect:frame
         screen:cocoaScreen->nativeScreen() styleMask:styleMask qPlatformWindow:this];

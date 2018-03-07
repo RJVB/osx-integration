@@ -120,6 +120,16 @@
 
         [appMenu addItem:[NSMenuItem separatorItem]];
 
+        windowsItem = [[NSMenuItem alloc] init];
+        windowsItem.title = @"Windows";
+        NSMenu *windowsMenu = [[[NSMenu alloc] initWithTitle:@"Windows"] autorelease];
+        windowsItem.submenu = windowsMenu;
+        [NSApplication sharedApplication].windowsMenu = windowsMenu;
+        [self enableWindowsMenu:NO];
+        [appMenu addItem:windowsItem];
+
+        [appMenu addItem:[NSMenuItem separatorItem]];
+
         // Hide Application
         hideItem = [[NSMenuItem alloc] initWithTitle:[@"Hide " stringByAppendingString:appName]
                                               action:@selector(hide:)
@@ -163,6 +173,7 @@
     [aboutQtItem release];
     [preferencesItem release];
     [servicesItem release];
+    [windowsItem release];
     [hideItem release];
     [hideAllOthersItem release];
     [showAllItem release];
@@ -316,6 +327,7 @@
     [preferencesItem setTitle:qt_mac_applicationmenu_string(PreferencesAppMenuItem).toNSString()];
     [quitItem setTitle:qt_mac_applicationmenu_string(QuitAppMenuItem).arg(qt_mac_applicationName()).toNSString()];
     [aboutItem setTitle:qt_mac_applicationmenu_string(AboutAppMenuItem).arg(qt_mac_applicationName()).toNSString()];
+    [windowsItem setTitle:qt_mac_applicationmenu_string(WindowsAppMenuItem).toNSString()];
 #endif
 }
 
@@ -363,6 +375,17 @@
 {
     // don't include the quitItem here, since we want it always visible and enabled regardless
     return [NSArray arrayWithObjects:preferencesItem, aboutItem, aboutQtItem, lastAppSpecificItem, nil];
+}
+
+- (void) enableWindowsMenu:(BOOL)enabled
+{
+    if (enabled) {
+        windowsItem.enabled = YES;
+        windowsItem.hidden = NO;
+    } else {
+        windowsItem.enabled = NO;
+        windowsItem.hidden = YES;
+    }
 }
 
 @end
