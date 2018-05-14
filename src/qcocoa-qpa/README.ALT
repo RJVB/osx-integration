@@ -1,3 +1,10 @@
+20180514 : upstream head (5.9): f8cbde9b0afd427d25017b46209c3119c8919e5e (v5.9.5-24-gf8cbde9b0a)
+Changes: git log fef6b31b994befac0ee14391572ebc2b9b33e104..f8cbde9b0afd427d25017b46209c3119c8919e5e src/plugins/platforms/cocoa
+commit 282167b99eaa8f09d914f1b01b3af59b4e88f3e0
+    macOS: Handle NaN mouse event positions
+commit 91cf255c5ad4eea8ad2022d8d9904f8b6419024a
+    Cocoa: Fix isChildNSWindow() for embedded QWindows
+
 20180207 : upstream head (5.9): fef6b31b994befac0ee14391572ebc2b9b33e104 (v5.9.4-86-gfef6b31b99)
  src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm         |  12 ++-
  src/plugins/platforms/cocoa/qcocoamenu.mm                     |   6 +-
