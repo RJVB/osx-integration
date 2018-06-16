@@ -46,7 +46,6 @@
 #include <qlineedit.h>
 #include <qapplication.h>
 #include <qdesktopwidget.h>
-#include <private/qdesktopwidget_p.h>
 #include <qlistview.h>
 #if QT_CONFIG(tableview)
 #include <qtableview.h>
@@ -266,15 +265,9 @@ QRect QComboBoxPrivate::popupGeometry(int screen) const
     bool useFullScreenForPopupMenu = false;
     if (const QPlatformTheme *theme = QGuiApplicationPrivate::platformTheme())
         useFullScreenForPopupMenu = theme->themeHint(QPlatformTheme::UseFullScreenForPopupMenu).toBool();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-    return useFullScreenForPopupMenu ?
-           QDesktopWidgetPrivate::screenGeometry(screen) :
-           QDesktopWidgetPrivate::availableGeometry(screen);
-#else
     return useFullScreenForPopupMenu ?
            QApplication::desktop()->screenGeometry(screen) :
            QApplication::desktop()->availableGeometry(screen);
-#endif
 }
 
 bool QComboBoxPrivate::updateHoverControl(const QPoint &pos)
@@ -2653,11 +2646,7 @@ void QComboBox::showPopup()
     QComboBoxPrivateContainer* container = d->viewContainer();
     QRect listRect(style->subControlRect(QStyle::CC_ComboBox, &opt,
                                          QStyle::SC_ComboBoxListBoxPopup, this));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-    QRect screen = d->popupGeometry(QDesktopWidgetPrivate::screenNumber(this));
-#else
     QRect screen = d->popupGeometry(QApplication::desktop()->screenNumber(this));
-#endif
 
     QPoint below = mapToGlobal(listRect.bottomLeft());
     int belowHeight = screen.bottom() - below.y();

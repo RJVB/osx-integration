@@ -105,7 +105,6 @@ if(Qt5_FOUND AND (NOT ${Qt5_VERSION} VERSION_LESS ${QT_REAL_MIN_VERSION}))
             Qt5::Gui
             Qt5::Widgets
             Qt5::PrintSupport
-            ${QT_FRAMEWORKS_DIR}/libQt5CglSupport.a
             ${QT_FRAMEWORKS_DIR}/libQt5ClipboardSupport.a
             ${QT_FRAMEWORKS_DIR}/libQt5FontDatabaseSupport.a
             ${QT_FRAMEWORKS_DIR}/libQt5GraphicsSupport.a

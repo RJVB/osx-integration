@@ -181,7 +181,7 @@ KHintsSettingsMac::KHintsSettingsMac(KdeMacTheme *theme)
     updateShowIconsInMenuItems(cg);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-    m_hints[QPlatformTheme::ShowShortcutsInContextMenus] = true;
+    hints()[QPlatformTheme::ShowShortcutsInContextMenus] = true;
 #endif
 
 #ifdef DBUS_SUPPORT_ENABLED
