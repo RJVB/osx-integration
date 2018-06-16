@@ -34,6 +34,7 @@ a Qt patch (or a dedicated event handler) to do anything useful though.
 
 This component should still build against Qt 5.5.x; the other components need at
 least Qt 5.8 .
+* See the README.ALT files in the qmacstyle and qcocoa-qpa directories!! *
 
 ### QMacStyle
 A modified fork of the native macintosh style from Qt 5.9 (git) which doesn't
