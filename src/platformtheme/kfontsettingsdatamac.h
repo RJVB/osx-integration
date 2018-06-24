@@ -42,7 +42,7 @@ public:
     };
 
     KFontSettingsDataMac();
-    ~KFontSettingsDataMac();
+    ~KFontSettingsDataMac() override;
 
 public Q_SLOTS:
     void dropFontSettingsCache();

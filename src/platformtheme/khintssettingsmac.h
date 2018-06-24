@@ -34,7 +34,7 @@ class KHintsSettingsMac : public KHintsSettings
     Q_OBJECT
 public:
     explicit KHintsSettingsMac();
-    virtual ~KHintsSettingsMac();
+    ~KHintsSettingsMac() override;
 
     QStringList xdgIconThemePaths() const;
 

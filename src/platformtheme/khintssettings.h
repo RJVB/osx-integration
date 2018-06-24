@@ -52,7 +52,7 @@ public:
                             SETTINGS_LOCALE, SETTINGS_STYLE
                           };
     explicit KHintsSettings();
-    virtual ~KHintsSettings();
+    ~KHintsSettings() override;
 
     inline QVariant hint(QPlatformTheme::ThemeHint hint) const
     {

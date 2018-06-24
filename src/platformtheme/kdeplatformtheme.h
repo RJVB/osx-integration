@@ -35,7 +35,7 @@ class KdePlatformTheme : public QPlatformTheme
 {
 public:
     KdePlatformTheme();
-    ~KdePlatformTheme();
+    ~KdePlatformTheme() override;
 
     QVariant themeHint(ThemeHint hint) const override;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
