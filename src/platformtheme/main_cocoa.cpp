@@ -44,7 +44,7 @@ class CocoaPlatformThemePlugin : public QPlatformThemePlugin
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QPA.QPlatformThemeFactoryInterface.5.1" FILE "cocoaplatformtheme.json")
 public:
-    CocoaPlatformThemePlugin(QObject *parent = Q_NULLPTR)
+    CocoaPlatformThemePlugin(QObject *parent = nullptr)
         : QPlatformThemePlugin(parent)
     {
         if (qEnvironmentVariableIsSet("KDE_LAYOUT_USES_WIDGET_RECT")) {

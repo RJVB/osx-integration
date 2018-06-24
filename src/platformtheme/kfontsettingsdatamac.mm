@@ -44,7 +44,7 @@ static const char GeneralId[] =      "General";
 // San Francisco. With luck this will be caught by QFontDatabase::GeneralFont
 const char DefaultFont[] =    "Lucida Grande";
 static const char DefaultFixedFont[] = "Monaco";
-static const char *LocalDefaultFont = NULL;
+static const char *LocalDefaultFont = nullptr;
 
 // See README.fonts.txt for information and thoughts about native/default fonts
 
@@ -79,7 +79,7 @@ static const char *fontNameFor(QFontDatabase::SystemFont role)
         }
         return fn;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -138,7 +138,7 @@ KFontSettingsDataMac::KFontSettingsDataMac()
         // remove any information that already have been cached by our parent
         // IFF we don't have our own mFonts copy
         // delete mFonts[i];
-        mFonts[i] = 0;
+        mFonts[i] = nullptr;
     }
 }
 
@@ -157,7 +157,7 @@ KFontSettingsDataMac::~KFontSettingsDataMac()
     if (LocalDefaultFont) {
         free((void*)(LocalDefaultFont));
     }
-    LocalDefaultFont = NULL;
+    LocalDefaultFont = nullptr;
 }
 
 QFont *KFontSettingsDataMac::font(FontTypes fontType)
@@ -183,7 +183,7 @@ QFont *KFontSettingsDataMac::font(FontTypes fontType)
             } else {
                 // our caller must handle NULL, preferably by relaying the font request
                 // to the native platform theme (see KdeMacTheme::font()).
-                return NULL;
+                return nullptr;
             }
         }
         const KConfigGroup configGroup(kdeGlobals(), DefaultFontData[fontType].ConfigGroupKey);

@@ -73,7 +73,7 @@ public:
 };
 
 KHintsSettingsMac::KHintsSettingsMac()
-    : styleProxy(0)
+    : styleProxy(nullptr)
 {
     KSharedConfigPtr mKdeGlobals = kdeGlobals();
     if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE")) {
