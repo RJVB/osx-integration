@@ -37,7 +37,21 @@ option(USE_PLCRASHREPORTER
         "Use the Plausible CrashReporter (https://www.plcrashreporter.org)"
         OFF)
 
+find_package(ECM 5.42.0  NO_MODULE)
+
+
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_SOURCE_DIR}/cmake)
+
+
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(FeatureSummary)
+include(GenerateExportHeader)
+include(ECMQtDeclareLoggingCategory)
+
+set_package_properties(ECM PROPERTIES TYPE REQUIRED DESCRIPTION "Extra CMake Modules." URL "https://projects.kde.org/projects/kdesupport/extra-cmake-modules")
+
 add_feature_info("KDE platform theme plugin" BUILD_KDE_THEME_PLUGIN "")
 add_feature_info("Build the Qt plugins" BUILD_QT_PLUGINS
         "Should the Qt Cocoa QPA and Aqua style plugins be built")
@@ -53,22 +67,6 @@ add_feature_info("Emulate a Menu key" EMULATE_MENU_KEY
         "Emulate the presence of a Menu key as on PC keyboards when the right Command+Option keys are pressed.")
 add_feature_info("Build for use with the Infinality+Ultimate patch-set" HAVE_INFINALITY "")
 
-find_package(ECM 5.42.0  NO_MODULE)
-set_package_properties(ECM PROPERTIES TYPE REQUIRED DESCRIPTION "Extra CMake Modules." URL "https://projects.kde.org/projects/kdesupport/extra-cmake-modules")
-
-
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_SOURCE_DIR}/cmake)
-
-
-include(GenerateExportHeader)
-include(CMakePackageConfigHelpers)
-include(ECMSetupVersion)
-include(ECMGenerateHeaders)
-include(ECMQtDeclareLoggingCategory)
-
-include(KDEInstallDirs)
-include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
-include(KDECMakeSettings)
 
 # for the optional Qt QPA and style plugins
 # (note that they have not yet been tested against Qt 5.7)
@@ -94,6 +92,7 @@ message(STATUS "KF5_VERSION=${KF5_VERSION}")
 if(BUILD_KDE_THEME_PLUGIN)
     set(KF5_DEP_VERSION "5.42.0") # handled by release scripts
 
+    include(ECMSetupVersion)
     ecm_setup_version(${KF5_VERSION} VARIABLE_PREFIX OSXINTEGRATION
                       VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/osxintegration_version.h"
                       PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5OSXIntegrationConfigVersion.cmake"
