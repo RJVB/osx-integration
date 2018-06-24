@@ -38,7 +38,7 @@ class KdeMacTheme : public KdePlatformTheme
 {
 public:
     KdeMacTheme();
-    ~KdeMacTheme();
+    ~KdeMacTheme() override;
 
     // KdeMacTheme must provide platform menu methods or else there will be no menus
     QPlatformMenuItem* createPlatformMenuItem() const override;

@@ -45,7 +45,7 @@ public:
     };
 
     KFontSettingsDataMac(KdeMacTheme *theme);
-    ~KFontSettingsDataMac();
+    ~KFontSettingsDataMac() override;
 
     const char *fontNameFor(QFontDatabase::SystemFont role) const;
 
