@@ -53,9 +53,8 @@ add_feature_info("Emulate a Menu key" EMULATE_MENU_KEY
         "Emulate the presence of a Menu key as on PC keyboards when the right Command+Option keys are pressed.")
 add_feature_info("Build for use with the Infinality+Ultimate patch-set" HAVE_INFINALITY "")
 
-find_package(ECM 5.20.0  NO_MODULE)
+find_package(ECM 5.42.0  NO_MODULE)
 set_package_properties(ECM PROPERTIES TYPE REQUIRED DESCRIPTION "Extra CMake Modules." URL "https://projects.kde.org/projects/kdesupport/extra-cmake-modules")
-# feature_summary(WHAT REQUIRED_PACKAGES_NOT_FOUND FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
 
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_SOURCE_DIR}/cmake)
@@ -93,8 +92,7 @@ execute_process(COMMAND cmake/git_version.sh
 message(STATUS "KF5_VERSION=${KF5_VERSION}")
 
 if(BUILD_KDE_THEME_PLUGIN)
-    # 20170119: v5.30.0 is synced with plasma-integration 5.8.95
-    set(KF5_DEP_VERSION "5.33.0") # handled by release scripts
+    set(KF5_DEP_VERSION "5.42.0") # handled by release scripts
 
     ecm_setup_version(${KF5_VERSION} VARIABLE_PREFIX OSXINTEGRATION
                       VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/osxintegration_version.h"
