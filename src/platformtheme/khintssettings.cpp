@@ -90,7 +90,8 @@ KSharedConfigPtr &KHintsSettings::DefaultLnfConfig()
     return mDefaultLnfConfig;
 }
 
-KHintsSettings::KHintsSettings() : QObject(0)
+KHintsSettings::KHintsSettings()
+    : QObject(nullptr)
 {
     kdeGlobals();
     KConfigGroup cg(mKdeGlobals, "KDE");

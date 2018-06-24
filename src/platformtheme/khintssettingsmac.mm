@@ -75,7 +75,7 @@ public:
 
 KHintsSettingsMac::KHintsSettingsMac(KdeMacTheme *theme)
     : mTheme(theme)
-    , styleProxy(0)
+    , styleProxy(nullptr)
 {
     KSharedConfigPtr mKdeGlobals = kdeGlobals();
     if (mTheme->verbose) {

@@ -44,7 +44,7 @@ KFontSettingsData::KFontSettingsData()
 #endif
 
     for (int i = 0; i < FontTypesCount; ++i) {
-        mFonts[i] = 0;
+        mFonts[i] = nullptr;
     }
 }
 
@@ -120,10 +120,10 @@ void KFontSettingsData::dropFontSettingsCache()
     }
     for (int i = 0; i < FontTypesCount; ++i) {
         delete mFonts[i];
-        mFonts[i] = 0;
+        mFonts[i] = nullptr;
     }
 
-    QWindowSystemInterface::handleThemeChange(0);
+    QWindowSystemInterface::handleThemeChange(nullptr);
 
     if (qobject_cast<QApplication *>(QCoreApplication::instance())) {
         QApplication::setFont(*font(KFontSettingsData::GeneralFont));

@@ -46,7 +46,7 @@ class KdePlatformThemePlugin : public QPlatformThemePlugin
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QPA.QPlatformThemeFactoryInterface.5.1" FILE "kdeplatformtheme.json")
 public:
-    KdePlatformThemePlugin(QObject *parent = Q_NULLPTR)
+    KdePlatformThemePlugin(QObject *parent = nullptr)
         : QPlatformThemePlugin(parent)
     {
         if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_DISABLED")) {
