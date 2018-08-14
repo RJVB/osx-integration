@@ -1,3 +1,8 @@
+20180814 : upstream head (5.9): eaa2e164b0559b37dbcd060cd31e110d2775ffd6 (v5.9.6-21-geaa2e164b0)
+Changes:
+commit fc559c079ec64f3475ca24503b774f9b7a51c14c
+    cocoa: Don't trigger security dialog on drag
+
 20180514 : upstream head (5.9): f8cbde9b0afd427d25017b46209c3119c8919e5e (v5.9.5-24-gf8cbde9b0a)
 Changes: git log fef6b31b994befac0ee14391572ebc2b9b33e104..f8cbde9b0afd427d25017b46209c3119c8919e5e src/plugins/platforms/cocoa
 commit 282167b99eaa8f09d914f1b01b3af59b4e88f3e0
