@@ -1,0 +1,67 @@
+commit b5221dff520efa3bb923c4faeeeb5712f7724a87
+Author: Gabriel de Dietrich <gabriel.dedietrich@qt.io>
+Date:   Thu Jan 4 10:59:11 2018 -0800
+
+    QStyleHelper: Use palette cache key in pixmap key
+    
+    This reverts commit d7bcdc3a442b99c2caebd4cfd38de67e14090e05.
+    
+    Now that QPalette::setBrush() is a bit smarter (see
+    c564779c071b35fddb76f4e50afda4305b634651), we can be
+    confident the palette's cache key won't change so often.
+    Therefore, we can use it again as part of every pixmap's
+    cache key.
+    
+    Change-Id: I5cab2296a937f9149c7745291e0442eea24f4e9d
+    Task-number: QTBUG-65475
+    Reviewed-by: Friedemann Kleint <Friedemann.Kleint@qt.io>
+    Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
+    (cherry picked from commit 1e75dcf2518e37a7b83d006a4e002f972615b43b)
+    Reviewed-by: Gabriel de Dietrich <gabriel.dedietrich@qt.io>
+
+diff --git a/private/qstylehelper.cpp b/private/qstylehelper.cpp
+index 141b731b65..ef66401357 100644
+--- a/private/qstylehelper.cpp
++++ b/private/qstylehelper.cpp
+@@ -51,8 +51,6 @@
+ 
+ #include "qstylehelper_p.h"
+ #include <qstringbuilder.h>
+-#include <qdatastream.h>
+-#include <qcryptographichash.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -66,6 +64,7 @@ QString uniqueName(const QString &key, const QStyleOption *option, const QSize &
+     QString tmp = key % HexString<uint>(option->state)
+                       % HexString<uint>(option->direction)
+                       % HexString<uint>(complexOption ? uint(complexOption->activeSubControls) : 0u)
++                      % HexString<quint64>(option->palette.cacheKey())
+                       % HexString<uint>(size.width())
+                       % HexString<uint>(size.height());
+ 
+@@ -77,24 +76,6 @@ QString uniqueName(const QString &key, const QStyleOption *option, const QSize &
+     }
+ #endif // QT_CONFIG(spinbox)
+ 
+-    // QTBUG-56743, try to create a palette cache key reflecting the value,
+-    // as leaks may occur in conjunction with QStyleSheetStyle/QRenderRule modifying
+-    // palettes when using QPalette::cacheKey()
+-    if (option->palette != QGuiApplication::palette()) {
+-        tmp.append(QLatin1Char('P'));
+-#ifndef QT_NO_DATASTREAM
+-        QByteArray key;
+-        key.reserve(5120); // Observed 5040B for a serialized palette on 64bit
+-        {
+-            QDataStream str(&key, QIODevice::WriteOnly);
+-            str << option->palette;
+-        }
+-        const QByteArray sha1 = QCryptographicHash::hash(key, QCryptographicHash::Sha1).toHex();
+-        tmp.append(QString::fromLatin1(sha1));
+-#else // QT_NO_DATASTREAM
+-        tmp.append(QString::number(option->palette.cacheKey(), 16));
+-#endif // !QT_NO_DATASTREAM
+-    }
+     return tmp;
+ }
+ 

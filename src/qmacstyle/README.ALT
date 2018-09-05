@@ -1,3 +1,10 @@
+20180905 : upstream head (5.9): 5f2ab16bbc6e6345f3ec2229b712ef309f1ff18b (v5.9.6-30-g5f2ab16bbc)
+ src/widgets/styles/qstylehelper.cpp
+patch: patches/22-sync-upstream-180905.diff
+Changes:
+commit b5221dff520efa3bb923c4faeeeb5712f7724a87
+    QStyleHelper: Use palette cache key in pixmap key
+
 20180514 : upstream head (5.9): f8cbde9b0afd427d25017b46209c3119c8919e5e (v5.9.5-24-gf8cbde9b0a)
 Nothing.
 
