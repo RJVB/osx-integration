@@ -114,7 +114,7 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuDelegate);
     }
 
     QCocoaMenuItem *menuItem = reinterpret_cast<QCocoaMenuItem *>(item.tag);
-    if (m_menu->items().contains(menuItem)) {
+    if (menuItem && m_menu->items().contains(menuItem)) {
         if (QCocoaMenu *itemSubmenu = menuItem->menu())
             itemSubmenu->setAttachedItem(item);
     }
@@ -150,7 +150,7 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuDelegate);
     QCocoaMenuItem *cocoaItem = reinterpret_cast<QCocoaMenuItem *>([item tag]);
     // Menu-holding items also get a target to play nicely
     // with NSMenuValidation but should not trigger.
-    if (cocoaItem->menu())
+    if (!cocoaItem || cocoaItem->menu())
         return;
     QScopedScopeLevelCounter scopeLevelCounter(QGuiApplicationPrivate::instance()->threadData);
     QGuiApplicationPrivate::modifier_buttons = [QNSView convertKeyModifiers:[NSEvent modifierFlags]];

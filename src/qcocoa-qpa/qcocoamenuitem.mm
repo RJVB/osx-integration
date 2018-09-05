@@ -113,6 +113,7 @@ QCocoaMenuItem::~QCocoaMenuItem()
 
     if (m_menu && m_menu->menuParent() == this)
         m_menu->setMenuParent(0);
+    [m_native setTag:0];
     if (m_merged) {
         [m_native setHidden:YES];
     } else {
@@ -155,6 +156,7 @@ void QCocoaMenuItem::setMenu(QPlatformMenu *menu)
     } else {
         // we previously had a menu, but no longer
         // clear out our item so the nexy sync() call builds a new one
+//         [m_native setTag:0];
         [m_native release];
         m_native = nil;
     }
@@ -222,6 +224,7 @@ NSMenuItem *QCocoaMenuItem::sync()
     bool noText = m_text.isEmpty();
     if ( (m_isSeparator != isNativeSeparator && noText)
         || (isNativeSeparator && !noText)) {
+//         [m_native setTag:0];
         [m_native release];
         if (m_isSeparator && m_text.isEmpty()) {
             m_native = [[NSMenuItem separatorItem] retain];
@@ -301,6 +304,7 @@ NSMenuItem *QCocoaMenuItem::sync()
             [m_native setTag:reinterpret_cast<NSInteger>(this)];
         } else if (m_merged) {
             // was previously merged, but no longer
+            [m_native setTag:0];
             [m_native release];
             m_native = nil; // create item below
             m_merged = false;
