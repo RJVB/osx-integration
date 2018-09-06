@@ -1,0 +1,66 @@
+commit 6bcfabc371bb1c9e1dc0cf36c5d9d05b77815065
+Author: R.J.V. Bertin <rjvbertin@gmail.com>
+Date:   Wed Sep 5 18:59:20 2018 +0200
+
+    QAltCocoa : menuitem housekeeping (experimental)
+    
+    Committed from host : Portia.local
+
+diff --git a/cocoa/qcocoamenu.mm b/cocoa/qcocoamenu.mm
+index 14ce632..9ebc0e6 100644
+--- a/cocoa/qcocoamenu.mm
++++ b/cocoa/qcocoamenu.mm
+@@ -114,7 +114,7 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuDelegate);
+     }
+ 
+     QCocoaMenuItem *menuItem = reinterpret_cast<QCocoaMenuItem *>(item.tag);
+-    if (m_menu->items().contains(menuItem)) {
++    if (menuItem && m_menu->items().contains(menuItem)) {
+         if (QCocoaMenu *itemSubmenu = menuItem->menu())
+             itemSubmenu->setAttachedItem(item);
+     }
+@@ -150,7 +150,7 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QCocoaMenuDelegate);
+     QCocoaMenuItem *cocoaItem = reinterpret_cast<QCocoaMenuItem *>([item tag]);
+     // Menu-holding items also get a target to play nicely
+     // with NSMenuValidation but should not trigger.
+-    if (cocoaItem->menu())
++    if (!cocoaItem || cocoaItem->menu())
+         return;
+     QScopedScopeLevelCounter scopeLevelCounter(QGuiApplicationPrivate::instance()->threadData);
+     QGuiApplicationPrivate::modifier_buttons = [QNSView convertKeyModifiers:[NSEvent modifierFlags]];
+diff --git a/cocoa/qcocoamenuitem.mm b/cocoa/qcocoamenuitem.mm
+index 440b3f0..cd494fe 100644
+--- a/cocoa/qcocoamenuitem.mm
++++ b/cocoa/qcocoamenuitem.mm
+@@ -113,6 +113,7 @@ QCocoaMenuItem::~QCocoaMenuItem()
+ 
+     if (m_menu && m_menu->menuParent() == this)
+         m_menu->setMenuParent(0);
++    [m_native setTag:0];
+     if (m_merged) {
+         [m_native setHidden:YES];
+     } else {
+@@ -155,6 +156,7 @@ void QCocoaMenuItem::setMenu(QPlatformMenu *menu)
+     } else {
+         // we previously had a menu, but no longer
+         // clear out our item so the nexy sync() call builds a new one
++//         [m_native setTag:0];
+         [m_native release];
+         m_native = nil;
+     }
+@@ -222,6 +224,7 @@ NSMenuItem *QCocoaMenuItem::sync()
+     bool noText = m_text.isEmpty();
+     if ( (m_isSeparator != isNativeSeparator && noText)
+         || (isNativeSeparator && !noText)) {
++//         [m_native setTag:0];
+         [m_native release];
+         if (m_isSeparator && m_text.isEmpty()) {
+             m_native = [[NSMenuItem separatorItem] retain];
+@@ -301,6 +304,7 @@ NSMenuItem *QCocoaMenuItem::sync()
+             [m_native setTag:reinterpret_cast<NSInteger>(this)];
+         } else if (m_merged) {
+             // was previously merged, but no longer
++            [m_native setTag:0];
+             [m_native release];
+             m_native = nil; // create item below
+             m_merged = false;
