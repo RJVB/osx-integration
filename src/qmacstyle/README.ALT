@@ -1,3 +1,13 @@
+20180906 : current upstream head: 4ba535616b8d3dfda7fbe162c6513f3008c1077a (5.10 branch v5.10.0-406-g4ba535616b)
+ src/widgets/widgets/qcombobox.cpp                                     |   4 +-
+patch: patches/15-sync-upstream-180906.diff
+Changes: git log 28cf5ae000de36cd6ad0df942c2f99bfa7e22129..4ba535616b8d3dfda7fbe162c6513f3008c1077a src/widgets/widgets/qcombobox.cpp
+commit 3061730c2a3df6432f773c4eb481c5e6e35ec14a
+    Merge remote-tracking branch 'origin/5.9' into 5.10
+commit 1cc15c4b6d65a22ab4018226a96baf843feb1f00
+    QComboBoxPrivate::showNativePopup(): Scale target rectangle
+
+
 20180207 : current upstream head: 28cf5ae000de36cd6ad0df942c2f99bfa7e22129 (5.10 branch v5.10.0-391-g28cf5ae000)
 patch: patches/14-merge-qt5100.diff
 
