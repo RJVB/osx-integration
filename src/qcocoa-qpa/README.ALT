@@ -1,3 +1,12 @@
+20180906 : current upstream head: 4ba535616b8d3dfda7fbe162c6513f3008c1077a (5.10 branch v5.10.0-406-g4ba535616b)
+ src/plugins/platforms/cocoa/qcocoamenu.mm                             |   7 +-
+patch: patches/31-sync-upstream-180906.diff
+Changes: git log 28cf5ae000de36cd6ad0df942c2f99bfa7e22129..4ba535616b8d3dfda7fbe162c6513f3008c1077a src/plugins/platforms/cocoa/qcocoamenu.mm
+commit 3061730c2a3df6432f773c4eb481c5e6e35ec14a
+    Merge remote-tracking branch 'origin/5.9' into 5.10
+commit 1ffc6ba402114a3443df5309dec186fd337e5b66
+    macOS: fix menu positioning on high-DPI
+
 20180207 : current upstream head: 28cf5ae000de36cd6ad0df942c2f99bfa7e22129 (5.10 branch v5.10.0-391-g28cf5ae000)
 patch: patches/30-merge-qt5100.diff
 
