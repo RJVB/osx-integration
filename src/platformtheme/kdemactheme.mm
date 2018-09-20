@@ -327,10 +327,35 @@ bool KdeMacThemeEventFilter::QNativeEventFilter::nativeEventFilter(const QByteAr
 }
 
 #ifdef ADD_MENU_KEY
+
+@implementation NSEvent (MenuKey)
++ (NSEvent*) menuKeyEventFromEvent:(NSEvent*) event
+{
+    const unichar menuKeyCode = static_cast<unichar>(NSMenuFunctionKey);
+    NSString *menuKeyString = [NSString stringWithCharacters:&menuKeyCode length:1];
+    NSEvent *menuKeyEvent = [NSEvent keyEventWithType:NSKeyDown
+        location:[event locationInWindow]
+        modifierFlags:([event modifierFlags] & ~(NSCommandKeyMask|NSAlternateKeyMask))
+        timestamp:[event timestamp] windowNumber:[event windowNumber]
+        context:nil characters:menuKeyString charactersIgnoringModifiers:menuKeyString isARepeat:NO
+        // the keyCode must be an 8-bit value not to be confounded with the Unicode value.
+        // My external PC keyboard generates keycode 110 (0x6e) for the Menu key, and judging 
+        // from Carbon/Events.h that value is unused.
+        keyCode:0x6e];
+//     qCWarning(PLATFORMTHEME) << "new event:" << QString::fromNSString([menuKeyEvent description]);
+    return menuKeyEvent;
+}
+@end
+
 NSEvent *KdeMacThemeEventFilter::nativeEventHandler(void *message)
 {
     NSEvent *event = static_cast<NSEvent *>(message);
     switch ([event type]) {
+        case NSKeyDown:
+            if ([event keyCode] == 0x6e) {
+                return [NSEvent menuKeyEventFromEvent:event];
+            }
+            break;
         case NSFlagsChanged: {
             switch ([event modifierFlags]) {
                 case 524608:
@@ -344,18 +369,7 @@ NSEvent *KdeMacThemeEventFilter::nativeEventHandler(void *message)
                         enabled = true;
 //                         qCWarning(PLATFORMTHEME) << Q_FUNC_INFO << "event=" << QString::fromNSString([event description])
 //                             << "modifierFlags=" << [event modifierFlags] << "keyCode=" << [event keyCode];
-                        const unichar menuKeyCode = static_cast<unichar>(NSMenuFunctionKey);
-                        NSString *menuKeyString = [NSString stringWithCharacters:&menuKeyCode length:1];
-                        NSEvent *menuKeyEvent = [NSEvent keyEventWithType:NSKeyDown
-                            location:[event locationInWindow]
-                            modifierFlags:([event modifierFlags] & ~(NSCommandKeyMask|NSAlternateKeyMask))
-                            timestamp:[event timestamp] windowNumber:[event windowNumber]
-                            context:nil characters:menuKeyString charactersIgnoringModifiers:menuKeyString isARepeat:NO
-                            // the keyCode must be an 8-bit value so not to be confounded with the Unicode value.
-                            // Judging from Carbon/Events.h 0x7f is unused.
-                            keyCode:0x7f];
-//                         qCWarning(PLATFORMTHEME) << "new event:" << QString::fromNSString([menuKeyEvent description]);
-                        return menuKeyEvent;
+                        return [NSEvent menuKeyEventFromEvent:event];
                     }
                     // fall through!
                 default:
