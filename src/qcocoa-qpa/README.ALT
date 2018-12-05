@@ -1,3 +1,8 @@
+20181205 : upstream head (5.9): 7b42fbebbae35a1037d23b58a41bea35dd448f53 (v5.9.7-17-g7b42fbebba)
+Changes:
+commit b11c5a6e5492ce25b8844550ff1a0dc233b61721
+    macOS: restore hidden popup windows
+
 20180814 : upstream head (5.9): eaa2e164b0559b37dbcd060cd31e110d2775ffd6 (v5.9.6-21-geaa2e164b0)
 Changes:
 commit fc559c079ec64f3475ca24503b774f9b7a51c14c
