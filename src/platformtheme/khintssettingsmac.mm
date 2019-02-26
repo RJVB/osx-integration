@@ -326,7 +326,7 @@ void KHintsSettingsMac::iconChanged(int group)
     return KHintsSettings::iconChanged(group);
 }
 
-Qt::ToolButtonStyle KHintsSettingsMac::toolButtonStyle(const KConfigGroup &cg) const
+Qt::ToolButtonStyle KHintsSettingsMac::toolButtonStyle(const KConfigGroup &cg)
 {
     const QString buttonStyle = cg.readEntry("ToolButtonStyle", "TextUnderIcon").toLower();
     return buttonStyle == QLatin1String("textbesideicon") ? Qt::ToolButtonTextBesideIcon

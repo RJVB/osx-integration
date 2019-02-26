@@ -46,7 +46,7 @@ protected Q_SLOTS:
 protected:
     void loadPalettes();
     void iconChanged(int group);
-    Qt::ToolButtonStyle toolButtonStyle(const KConfigGroup &cg) const;
+    Qt::ToolButtonStyle toolButtonStyle(const KConfigGroup &cg);
     void updateCursorTheme();
     void checkNativeTheme(const QString &theme);
 private:

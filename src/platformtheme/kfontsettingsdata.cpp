@@ -30,14 +30,25 @@
 #ifdef DBUS_SUPPORT_ENABLED
 #include <QDBusMessage>
 #include <QDBusConnection>
+#include <QDBusReply>
 #endif
 #include <qpa/qwindowsysteminterface.h>
 
 #include <ksharedconfig.h>
 #include <kconfiggroup.h>
 
+static inline bool checkUsePortalSupport()
+{
+#ifdef Q_OS_MACOS
+    return false;
+#else
+    return !QStandardPaths::locate(QStandardPaths::RuntimeLocation, QStringLiteral("flatpak-info")).isEmpty() || qEnvironmentVariableIsSet("SNAP");
+#endif
+}
+
 KFontSettingsData::KFontSettingsData()
     : QObject(nullptr)
+    , mUsePortal(checkUsePortalSupport())
 {
 #ifdef DBUS_SUPPORT_ENABLED
     QMetaObject::invokeMethod(this, "delayedDBusConnects", Qt::QueuedConnection);
@@ -104,6 +115,8 @@ QFont *KFontSettingsData::font(FontTypes fontType)
         if (!fontInfo.isEmpty()) {
             cachedFont->fromString(fontInfo);
         } else {
+            // set the canonical stylename here, where it cannot override
+            // user-specific font attributes if those do not include a stylename.
             cachedFont->setStyleName(QLatin1String(fontData.StyleName));
         }
 
@@ -137,5 +150,52 @@ void KFontSettingsData::delayedDBusConnects()
 #ifdef DBUS_SUPPORT_ENABLED
     QDBusConnection::sessionBus().connect(QString(), QStringLiteral("/KDEPlatformTheme"), QStringLiteral("org.kde.KDEPlatformTheme"),
                                           QStringLiteral("refreshFonts"), this, SLOT(dropFontSettingsCache()));
+
+    if (mUsePortal) {
+        QDBusConnection::sessionBus().connect(QString(), QStringLiteral("/org/freedesktop/portal/desktop"), QStringLiteral("org.freedesktop.portal.Settings"),
+                                              QStringLiteral("SettingChanged"), this, SLOT(slotPortalSettingChanged(QString,QString,QDBusVariant)));
+    }
 #endif
+}
+
+void KFontSettingsData::slotPortalSettingChanged(const QString &group, const QString &key, const QDBusVariant &value)
+{
+    Q_UNUSED(value);
+#ifdef DBUS_SUPPORT_ENABLED
+
+    if (group == QLatin1String("org.kde.kdeglobals.General") && key == QLatin1String("font")) {
+        dropFontSettingsCache();
+    }
+#else
+    Q_UNUSED(group);
+    Q_UNUSED(key);
+#endif
+}
+
+QString KFontSettingsData::readConfigValue(const QString &group, const QString &key, const QString &defaultValue) const
+{
+#ifdef DBUS_SUPPORT_ENABLED
+    if (mUsePortal) {
+        const QString settingName = QStringLiteral("org.kde.kdeglobals.%1").arg(group);
+        QDBusMessage message = QDBusMessage::createMethodCall(QStringLiteral("org.freedesktop.portal.Desktop"),
+                                                              QStringLiteral("/org/freedesktop/portal/desktop"),
+                                                              QStringLiteral("org.freedesktop.portal.Settings"),
+                                                              QStringLiteral("Read"));
+        message << settingName << key;
+
+        // FIXME: async?
+        QDBusReply<QVariant> reply = QDBusConnection::sessionBus().call(message);
+        if (reply.isValid()) {
+            QDBusVariant result = qvariant_cast<QDBusVariant>(reply.value());
+            const QString resultStr = result.variant().toString();
+
+            if (!resultStr.isEmpty()) {
+                return resultStr;
+            }
+        }
+    }
+#endif
+
+    const KConfigGroup configGroup(mKdeGlobals, group);
+    return configGroup.readEntry(key, defaultValue);
 }

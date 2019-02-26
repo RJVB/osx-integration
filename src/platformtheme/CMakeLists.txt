@@ -62,15 +62,15 @@ ecm_qt_declare_logging_category(platformtheme_SRCS
     CATEGORY_NAME ${PLUGIN_FILENAME}
 )
 
-include_directories(
-    ${Qt5Gui_PRIVATE_INCLUDE_DIRS}
-)
-
 # Use the same name for the platform theme module. This makes it impossible
 # to install both the plasma and the OS X integration modules, but that's
 # intentional.
 add_library(${PLUGIN_FILENAME} MODULE ${platformtheme_SRCS})
 
+target_link_libraries(${PLUGIN_FILENAME}
+    PRIVATE
+        Qt5::GuiPrivate
+)
 if (NOT DISABLE_DBUS_SUPPORT)
     target_link_libraries(${PLUGIN_FILENAME}
         PRIVATE
@@ -93,4 +93,5 @@ target_link_libraries(${PLUGIN_FILENAME}
 
 target_link_libraries(${PLUGIN_FILENAME} PRIVATE "-framework AppKit")
 
+set_target_properties(${PLUGIN_FILENAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/platformthemes/")
 install(TARGETS ${PLUGIN_FILENAME} DESTINATION ${KDE_INSTALL_QTPLUGINDIR}/platformthemes)

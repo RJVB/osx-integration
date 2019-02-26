@@ -21,6 +21,11 @@
 #ifndef KHINTS_SETTINGS_H
 #define KHINTS_SETTINGS_H
 
+#ifdef DBUS_SUPPORT_ENABLED
+#include <QDBusVariant>
+#else
+    class QDBusVariant;
+#endif
 #include <QObject>
 #include <QVariant>
 
@@ -71,6 +76,7 @@ protected Q_SLOTS:
     void setupIconLoader();
     void toolbarStyleChanged();
     void slotNotifyChange(int type, int arg);
+    void slotPortalSettingChanged(const QString &group, const QString &key, const QDBusVariant &value);
 
 protected:
     KSharedConfigPtr &kdeGlobals();
@@ -78,12 +84,14 @@ protected:
     KSharedConfigPtr &DefaultLnfConfig();
 
     QVariant readConfigValue(const QString &group, const QString &key, const QVariant &defaultValue);
+    QVariant readConfigValue(const KConfigGroup &cg, const QString &key, const QVariant &defaultValue) const;
     void loadPalettes();
     void iconChanged(int group);
     void updateQtSettings(KConfigGroup &cg);
     void updateShowIconsInMenuItems(KConfigGroup &cg);
-    Qt::ToolButtonStyle toolButtonStyle(const KConfigGroup &cg) const;
+    Qt::ToolButtonStyle toolButtonStyle(const KConfigGroup &cg);
     void updateCursorTheme();
+    void updatePortalSetting();
 
     inline QHash<QPlatformTheme::Palette, QPalette *> &palettes()
     {
@@ -101,6 +109,8 @@ private:
     KSharedConfigPtr mDefaultLnfConfig;
     KSharedConfigPtr mLnfConfig;
     bool verbose;
+    QMap<QString, QVariantMap> mKdeGlobalsPortal;
+    bool mUsePortal;
 };
 
 #endif //KHINTS_SETTINGS_H
