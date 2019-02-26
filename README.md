@@ -30,7 +30,9 @@ a Qt patch (or a dedicated event handler) to do anything useful though.
   from ~/.config or ~/Library/Preferences
 - QT_QPA_PLATFORMTHEME_DISABLED : disable the plugin completely.
 - PREFER_KDE_DIALOGS : force KDE dialogs even when configured to prefer native
-  file dialogs.
+  file dialogs (when set and not empty).
+- PREFER_NATIVE_DIALOGS : idem for native dialogs when NOT configured to prefer
+  native file dialogs.
 
 This component should still build against Qt 5.5.x; the other components need at
 least Qt 5.8 .
