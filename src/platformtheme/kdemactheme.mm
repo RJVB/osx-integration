@@ -425,8 +425,8 @@ How we get here:
 ============ */
 
 KdeMacTheme::KdeMacTheme()
-    : m_nativeInterface(nullptr)
-    , verbose(qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE"))
+    : verbose(qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE"))
+    , m_nativeInterface(nullptr)
 {
     if (strcasecmp(QT_VERSION_STR, qVersion())) {
         NSLog(@"Warning: the %s platform theme plugin for Mac was built against Qt %s but is running with Qt %s!",
@@ -723,6 +723,11 @@ QPlatformDialogHelper *KdeMacTheme::createPlatformDialogHelper(QPlatformTheme::D
     // a Qt dialog to be created instead of the native one. Weird.
     if (nativeTheme && m_isCocoa
             && (!qEnvironmentVariableIsSet("PREFER_KDE_DIALOGS") || qEnvironmentVariableIsEmpty("PREFER_KDE_DIALOGS"))) {
+        return nativeTheme->createPlatformDialogHelper(type);
+    }
+#else
+    if (nativeTheme && m_isCocoa
+            && qEnvironmentVariableIsSet("PREFER_NATIVE_DIALOGS") && !qEnvironmentVariableIsEmpty("PREFER_NATIVE_DIALOGS")) {
         return nativeTheme->createPlatformDialogHelper(type);
     }
 #endif
