@@ -468,7 +468,7 @@ KdeMacTheme::KdeMacTheme()
     qApp->installEventFilter(m_eventFilter);
 #endif
 #ifdef ADD_MENU_KEY
-    m_eventFilter->m_keyboardMonitor = 0;
+    m_eventFilter->m_keyboardMonitor = nullptr;
     @autoreleasepool {
         // set up a keyboard event monitor
         m_eventFilter->m_keyboardMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:KdeMacThemeEventFilter::keyboardMonitorMask
@@ -528,7 +528,7 @@ KdeMacTheme::~KdeMacTheme()
 #endif
     }
     delete m_eventFilter;
-    m_eventFilter = 0;
+    m_eventFilter = nullptr;
 }
 
 QPlatformMenuItem* KdeMacTheme::createPlatformMenuItem() const

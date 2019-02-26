@@ -62,7 +62,7 @@ public:
     }
 
     int layoutSpacing(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2,
-                        Qt::Orientation orientation, const QStyleOption *option = 0, const QWidget *widget = 0) const
+                        Qt::Orientation orientation, const QStyleOption *option = nullptr, const QWidget *widget = nullptr) const
     {
         int spacing = QProxyStyle::layoutSpacing(control1, control2, orientation, option, widget);
         qCWarning(PLATFORMTHEME) << "layoutSpacing=" << spacing;
@@ -252,6 +252,8 @@ void KHintsSettingsMac::checkNativeTheme(const QString &theme)
             loadPalettes();
         }
     }
+#else
+    Q_UNUSED(theme);
 #endif
 // do this only when certain that there's a QApplication instance:
 //         QApplication *app = qobject_cast<QApplication *>(QCoreApplication::instance());
