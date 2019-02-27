@@ -419,8 +419,8 @@ bool KDEPlatformFileDialogHelper::show(Qt::WindowFlags windowFlags, Qt::WindowMo
         if (!fDialogs.isEmpty()) {
             if (auto fDialog = fDialogs.at(0)) {
                 if (auto layout = m_parentWidget->layout()) {
+                    restoreSize();
                     if (m_dialog->windowHandle()) {
-                        restoreSize();
                         fDialog->resize(m_dialog->windowHandle()->size());
                     }
                     if (auto old = layout->replaceWidget(fDialog, m_dialog)) {
