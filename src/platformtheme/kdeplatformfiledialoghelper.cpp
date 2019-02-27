@@ -42,6 +42,7 @@
 #include <QPushButton>
 #include <QWindow>
 #include <QTextStream>
+#include <QFileDialog>
 
 namespace
 {
@@ -99,6 +100,7 @@ KDEPlatformFileDialog::KDEPlatformFileDialog()
     : KDEPlatformFileDialogBase()
     , m_fileWidget(new KFileWidget(QUrl(), this))
 {
+    m_fileWidget->setObjectName(QStringLiteral("KDEPlatformFileDialogFileWidget"));
     setLayout(new QVBoxLayout);
     connect(m_fileWidget, SIGNAL(filterChanged(QString)), SIGNAL(filterSelected(QString)));
     layout()->addWidget(m_fileWidget);
@@ -272,8 +274,21 @@ KDEPlatformFileDialogHelper::KDEPlatformFileDialogHelper()
 
 KDEPlatformFileDialogHelper::~KDEPlatformFileDialogHelper()
 {
-    saveSize();
-    delete m_dialog;
+    if (!m_dialogReparented) {
+        saveSize();
+        if (m_replaced) {
+            if (auto layout = m_parentWidget->layout()) {
+                if (auto old = layout->replaceWidget(m_dialog, m_replaced)) {
+                    qWarning() << Q_FUNC_INFO << old;
+                }
+            } else {
+                qWarning() << Q_FUNC_INFO << "delete" << m_replaced;
+                m_replaced->deleteLater();
+                m_replaced = nullptr;
+            }
+        }
+        delete m_dialog;
+    }
 }
 
 void KDEPlatformFileDialogHelper::initializeDialog()
@@ -393,10 +408,41 @@ void KDEPlatformFileDialogHelper::restoreSize()
 bool KDEPlatformFileDialogHelper::show(Qt::WindowFlags windowFlags, Qt::WindowModality windowModality, QWindow *parent)
 {
     initializeDialog();
+    m_parentWidget = parent ? QWidget::find(parent->winId()) : nullptr;
+    if (m_parentWidget) {
+        const auto fDialogs = m_parentWidget->findChildren<QFileDialog*>();
+        if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE")) {
+            qCWarning(PLATFORMTHEME) << Q_FUNC_INFO << this << windowFlags << m_dialog << parent << m_parentWidget;
+            qCWarning(PLATFORMTHEME) << "\tQFileDialogInstance property:" << m_parentWidget->property("QFileDialogInstance");
+            qCWarning(PLATFORMTHEME) << "\tQFileDialog children:" << fDialogs;
+        }
+        if (!fDialogs.isEmpty()) {
+            if (auto fDialog = fDialogs.at(0)) {
+                if (auto layout = m_parentWidget->layout()) {
+                    if (m_dialog->windowHandle()) {
+                        restoreSize();
+                        fDialog->resize(m_dialog->windowHandle()->size());
+                    }
+                    if (auto old = layout->replaceWidget(fDialog, m_dialog)) {
+                        m_replaced = fDialog;
+                        if (qEnvironmentVariableIsSet("QT_QPA_PLATFORMTHEME_VERBOSE") || fDialogs.size() > 1) {
+                            qCWarning(PLATFORMTHEME) << "\treplaced" << old->widget() << "with" << m_dialog;
+                        }
+                    }
+                }
+//                 m_dialogReparented = true;
+//                 m_dialog->setParent(m_parentWidget);
+                windowFlags = fDialog->windowFlags();
+                windowModality = fDialog->windowModality();
+            }
+        }
+    }
     m_dialog->setWindowFlags(windowFlags);
     m_dialog->setWindowModality(windowModality);
-    restoreSize();
-    m_dialog->windowHandle()->setTransientParent(parent);
+    if (!m_replaced) {
+        restoreSize();
+        m_dialog->windowHandle()->setTransientParent(parent);
+    }
     // Use a delayed show here to delay show() after the internal Qt invisible QDialog.
     // The delayed call shouldn't matter, because for other "real" native QPlatformDialog
     // implementation like Mac and Windows, the native dialog is not necessarily

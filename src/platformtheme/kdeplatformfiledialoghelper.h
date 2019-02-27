@@ -26,6 +26,7 @@
 
 class KFileWidget;
 class QDialogButtonBox;
+class QFileDialog;
 class KDEPlatformFileDialog : public KDEPlatformFileDialogBase
 {
     Q_OBJECT
@@ -86,6 +87,9 @@ private:
     bool m_directorySet = false;
     bool m_fileSelected = false;
     bool m_dialogInitialized = false;
+    bool m_dialogReparented = false;
+    QWidget *m_parentWidget = nullptr;
+    QFileDialog *m_replaced = nullptr;
 };
 
 #endif // KDEPLATFORMFILEDIALOGHELPER_H
