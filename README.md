@@ -33,6 +33,8 @@ a Qt patch (or a dedicated event handler) to do anything useful though.
   file dialogs (when set and not empty).
 - PREFER_NATIVE_DIALOGS : idem for native dialogs when NOT configured to prefer
   native file dialogs.
+- QT_MAC_FONTENGINE : pre-selects the font engine to be used: CoreText, FontConfig
+  or FreeType.
 
 This component should still build against Qt 5.5.x; the other components need at
 least Qt 5.8 .
