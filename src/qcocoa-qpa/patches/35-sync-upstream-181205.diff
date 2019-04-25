@@ -1,0 +1,75 @@
+commit b11c5a6e5492ce25b8844550ff1a0dc233b61721
+Author: Rafael Roquetto <rafaelr@blackmagicdesign.com>
+Date:   Mon Oct 1 09:16:28 2018 +1000
+
+    macOS: restore hidden popup windows
+    
+    We need to explicitly unhide popup windows that were previously
+    explicitly hidden by applicationWillHide, so that their visibility will
+    be effectively restored when the application is unhidden (otherwise the
+    windows are gone forever even though their internal visibility is set to
+    true).
+    
+    Change-Id: I4dbd209b07f769cc815851b40c41db0739ca2dc9
+    Task-number: QTBUG-71014
+    Reviewed-by: Timur Pocheptsov <timur.pocheptsov@qt.io>
+    Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+    Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+    (cherry picked from commit d02fed67814a3cb8f28a4f0ec61e075858fce238)
+    Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+
+diff --git a/cocoa/qcocoaapplicationdelegate.h b/cocoa/qcocoaapplicationdelegate.h
+index 59c71017e3..f5194f2004 100644
+--- a/cocoa/qcocoaapplicationdelegate.h
++++ b/cocoa/qcocoaapplicationdelegate.h
+@@ -88,6 +88,7 @@
+ #import <AppKit/AppKit.h>
+ 
+ #include <qglobal.h>
++#include <qwindowdefs.h>
+ #include <private/qcore_mac_p.h>
+ 
+ @class QT_MANGLE_NAMESPACE(QCocoaMenuLoader);
+@@ -97,6 +98,7 @@
+     NSMenu *dockMenu;
+     NSObject <NSApplicationDelegate> *reflectionDelegate;
+     bool inLaunch;
++    QWindowList hiddenWindows;
+ }
+ + (QT_MANGLE_NAMESPACE(QCocoaApplicationDelegate)*)sharedDelegate;
+ - (void)setDockMenu:(NSMenu *)newMenu;
+diff --git a/cocoa/qcocoaapplicationdelegate.mm b/cocoa/qcocoaapplicationdelegate.mm
+index 03148c769b..4a76c355f4 100644
+--- a/cocoa/qcocoaapplicationdelegate.mm
++++ b/cocoa/qcocoaapplicationdelegate.mm
+@@ -341,12 +341,28 @@ QT_END_NAMESPACE
+     // fact that the application itself is hidden, which will cause a problem when
+     // the application is made visible again.
+     const QWindowList topLevelWindows = QGuiApplication::topLevelWindows();
+-    for (QWindow *topLevelWindow : qAsConst(topLevelWindows)) {
+-        if ((topLevelWindow->type() & Qt::Popup) == Qt::Popup && topLevelWindow->isVisible())
++    for (QWindow *topLevelWindow : topLevelWindows) {
++        if ((topLevelWindow->type() & Qt::Popup) == Qt::Popup && topLevelWindow->isVisible()) {
+             topLevelWindow->hide();
++
++            if ((topLevelWindow->type() & Qt::Tool) == Qt::Tool)
++                hiddenWindows << topLevelWindow;
++        }
+     }
+ }
+ 
++- (void)applicationDidUnhide:(NSNotification *)notification
++{
++    if (reflectionDelegate
++        && [reflectionDelegate respondsToSelector:@selector(applicationDidUnhide:)])
++        [reflectionDelegate applicationDidUnhide:notification];
++
++    for (QWindow *window : qAsConst(hiddenWindows))
++        window->show();
++
++    hiddenWindows.clear();
++}
++
+ - (void)applicationDidBecomeActive:(NSNotification *)notification
+ {
+     if (reflectionDelegate
