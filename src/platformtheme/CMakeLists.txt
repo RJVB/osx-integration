@@ -62,15 +62,23 @@ ecm_qt_declare_logging_category(platformtheme_SRCS
     CATEGORY_NAME ${PLUGIN_FILENAME}
 )
 
+if (NOT Qt5::GuiPrivate)
+    include_directories(
+        ${Qt5Gui_PRIVATE_INCLUDE_DIRS}
+    )
+endif()
+
 # Use the same name for the platform theme module. This makes it impossible
 # to install both the plasma and the OS X integration modules, but that's
 # intentional.
 add_library(${PLUGIN_FILENAME} MODULE ${platformtheme_SRCS})
 
-target_link_libraries(${PLUGIN_FILENAME}
-    PRIVATE
-        Qt5::GuiPrivate
-)
+if (Qt5::GuiPrivate)
+    target_link_libraries(${PLUGIN_FILENAME}
+        PRIVATE
+            Qt5::GuiPrivate
+    )
+endif()
 if (NOT DISABLE_DBUS_SUPPORT)
     target_link_libraries(${PLUGIN_FILENAME}
         PRIVATE

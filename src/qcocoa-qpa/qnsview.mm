@@ -2108,8 +2108,14 @@ static QPoint mapWindowCoordinates(QWindow *source, QWindow *target, QPoint poin
     // Make sure the cursor is updated correctly if the mouse does not move and window is under cursor
     // by creating a fake move event, unless on 10.14 and later where doing so will trigger a security
     // warning dialog. FIXME: Find a way to update the cursor without fake mouse events.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion(QOperatingSystemVersion::MacOS, 10, 14))
         return;
+#else
+    if (QOperatingSystemVersion::current() >= Q_MV_OSX(10, 14)) {
+        return;
+    }
+#endif
 
     if (m_updatingDrag)
         return;
