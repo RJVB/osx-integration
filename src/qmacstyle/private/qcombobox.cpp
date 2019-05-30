@@ -2761,7 +2761,7 @@ void QComboBox::showPopup()
 #if QT_CONFIG(effects)
     bool scrollDown = (listRect.topLeft() == below);
     if (QApplication::isEffectEnabled(Qt::UI_AnimateCombo)
-        && !style->styleHint(QStyle::SH_ComboBox_Popup, &opt, this) && !window()->testAttribute(Qt::WA_DontShowOnScreen))
+        && !usePopup && !window()->testAttribute(Qt::WA_DontShowOnScreen))
         qScrollEffect(container, scrollDown ? QEffects::DownScroll : QEffects::UpScroll, 150);
 #endif
 
@@ -2797,7 +2797,7 @@ void QComboBox::showPopup()
     view()->setFocus();
 
     view()->scrollTo(view()->currentIndex(),
-                     style->styleHint(QStyle::SH_ComboBox_Popup, &opt, this)
+                     usePopup
                              ? QAbstractItemView::PositionAtCenter
                              : QAbstractItemView::EnsureVisible);
 
