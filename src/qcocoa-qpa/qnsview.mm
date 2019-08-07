@@ -841,8 +841,8 @@ static bool _q_dontOverrideCtrlLMB = false;
         // Check if the click is outside all popups.
         bool inside = false;
         QPointF qtScreenPoint = qt_mac_flipPoint([self screenMousePoint:theEvent]);
-        for (QList<QCocoaWindow *>::const_iterator it = popups->begin(); it != popups->end(); ++it) {
-            if ((*it)->geometry().contains(qtScreenPoint.toPoint())) {
+        for (const QCocoaWindow *popup : *popups) {
+            if (popup->geometry().contains(qtScreenPoint.toPoint())) {
                 inside = true;
                 break;
             }
