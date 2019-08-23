@@ -94,9 +94,14 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSWindowHelper);
 @interface QT_MANGLE_NAMESPACE(QNSWindow) : NSWindow<QNSWindowProtocol>
 {
     QNSWindowHelper *_helper;
+    BOOL _titlebarAppearsTransparent;
 }
 
 @property (nonatomic, readonly) QNSWindowHelper *helper;
+#if QT_MAC_DEPLOYMENT_TARGET_BELOW(__MAC_10_10, __IPHONE_NA)
+// stubs for a 10.10+ property
+@property BOOL titlebarAppearsTransparent;
+#endif
 
 - (id)initWithContentRect:(NSRect)contentRect
       screen:(NSScreen*)screen
@@ -110,9 +115,14 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSWindow);
 @interface QT_MANGLE_NAMESPACE(QNSPanel) : NSPanel<QNSWindowProtocol>
 {
     QNSWindowHelper *_helper;
+    BOOL _titlebarAppearsTransparent;
 }
 
 @property (nonatomic, readonly) QNSWindowHelper *helper;
+#if QT_MAC_DEPLOYMENT_TARGET_BELOW(__MAC_10_10, __IPHONE_NA)
+// stubs for a 10.10+ property
+@property BOOL titlebarAppearsTransparent;
+#endif
 
 - (id)initWithContentRect:(NSRect)contentRect
       screen:(NSScreen*)screen

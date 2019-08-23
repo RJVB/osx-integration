@@ -251,6 +251,10 @@ static void qt_closePopups()
 @implementation QNSWindow
 
 @synthesize helper = _helper;
+#if QT_MAC_DEPLOYMENT_TARGET_BELOW(__MAC_10_10, __IPHONE_NA)
+// stubs for a 10.10+ property
+@synthesize titlebarAppearsTransparent = _titlebarAppearsTransparent;
+#endif
 
 - (id)initWithContentRect:(NSRect)contentRect
       screen:(NSScreen*)screen
@@ -265,6 +269,7 @@ static void qt_closePopups()
 
     if (self) {
         _helper = [[QNSWindowHelper alloc] initWithNSWindow:self platformWindow:qpw];
+        _titlebarAppearsTransparent = false;
     }
     return self;
 }
@@ -336,6 +341,10 @@ static void qt_closePopups()
 @implementation QNSPanel
 
 @synthesize helper = _helper;
+#if QT_MAC_DEPLOYMENT_TARGET_BELOW(__MAC_10_10, __IPHONE_NA)
+// stubs for a 10.10+ property
+@synthesize titlebarAppearsTransparent = _titlebarAppearsTransparent;
+#endif
 
 + (void)applicationActivationChanged:(NSNotification*)notification
 {
@@ -422,6 +431,7 @@ static void qt_closePopups()
 
     if (self) {
         _helper = [[QNSWindowHelper alloc] initWithNSWindow:self platformWindow:qpw];
+        _titlebarAppearsTransparent = false;
 
         if (qpw->alwaysShowToolWindow()) {
             static dispatch_once_t onceToken;
