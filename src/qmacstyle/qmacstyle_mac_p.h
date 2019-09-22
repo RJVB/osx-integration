@@ -55,6 +55,13 @@
 #include <QtWidgets/private/qtwidgetsglobal_p.h>
 #include <QtWidgets/qcommonstyle.h>
 
+#ifdef WITH_KDE
+#include "kstyle.h"
+using ParentStyleClass = KStyle;
+#else
+using ParentStyleClass = QCommonStyle;
+#endif
+
 QT_BEGIN_NAMESPACE
 
 
@@ -65,7 +72,7 @@ class QPalette;
 class QPushButton;
 class QStyleOptionButton;
 class QMacStylePrivate;
-class QMacStyle : public QCommonStyle
+class QMacStyle : public ParentStyleClass
 {
     Q_OBJECT
 public:

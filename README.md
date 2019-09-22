@@ -45,6 +45,11 @@ A modified fork of the native macintosh style from Qt 5.9 (git) which doesn't
 impose the Mac standard font for QComboBox menu items and provides support
 for named menu sections in context menus and menus attached to a "non-native"
 menubar. Also builds against Qt 5.8.0 .
+When the KDE theme/platform plugin is built, this style will inherit KStyle
+from the FrameworkIntegration plugin, for somewhat better integration with
+KDE specifics. This is a private, adapted copy of the KStyle class. You can
+set APPLE_FORCE_X11=ON to activate the additional X11 support in KStyle (requires
+the X11Extras component from Qt5, and libxcb).
 A standalone build of this component can be done using the provided QMake file
 (qmacstyle/macstyle.pro).
 

@@ -193,3 +193,9 @@ in commit #b2bd0e87d69efe48b809e564a6b229363988be52
 files touched and updated in commit #ba0a81bc50e50edc7334697ce3a774bc7c52f8ac:
 src/qmacstyle/private/qcommonstyle.cpp (src/widgets/styles/qcommonstyle.cpp)
 src/qmacstyle/private/qtcore-config.h
+
+20190922 : When the KDE theme/platform plugin is built, this style will inherit KStyle
+from the FrameworkIntegration plugin, for somewhat better integration with
+KDE specifics. This is a private, adapted copy of the KStyle class. You can
+set APPLE_FORCE_X11=ON to activate the additional X11 support in KStyle (requires
+the X11Extras component from Qt5, and libxcb).

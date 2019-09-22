@@ -26,6 +26,10 @@ if(Qt5_FOUND AND (NOT ${Qt5_VERSION} VERSION_LESS ${QT_REAL_MIN_VERSION}))
 
     remove_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
     add_definitions(-DQT_PLUGIN)
+    if(BUILD_KDE_THEME_PLUGIN)
+        add_definitions(-DWITH_KDE)
+        add_subdirectory(frameworkintegration)
+    endif()
     set(qaltmacstyle_SRCS
         qmacstyle_mac.mm
         main.mm
@@ -45,7 +49,12 @@ if(Qt5_FOUND AND (NOT ${Qt5_VERSION} VERSION_LESS ${QT_REAL_MIN_VERSION}))
     target_link_libraries(qaltmacstyle PRIVATE
         Qt5::Core
         Qt5::Gui
-        Qt5::Widgets
+        Qt5::Widgets)
+    if(BUILD_KDE_THEME_PLUGIN)
+        target_link_libraries(qaltmacstyle PRIVATE
+            KF5::Style)
+    endif()
+    target_link_libraries(qaltmacstyle PRIVATE
         "-framework AppKit -framework Carbon")
     install(TARGETS qaltmacstyle DESTINATION ${KDE_INSTALL_QTPLUGINDIR}/styles)
 
