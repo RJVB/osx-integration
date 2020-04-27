@@ -467,7 +467,7 @@ int KStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWidget 
 
     case SH_Widget_Animate: {
         KConfigGroup g(KSharedConfig::openConfig(), "KDE-Global GUI Settings");
-        return g.readEntry("GraphicEffectsLevel", true);
+        return g.readEntry("GraphicEffectsLevel", false);
     }
 
     case QStyle::SH_Menu_SubMenuSloppyCloseTimeout:
