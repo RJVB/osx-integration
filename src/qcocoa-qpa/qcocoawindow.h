@@ -52,6 +52,10 @@
 #include "qnsview.h"
 #include "qt_mac_p.h"
 
+#ifndef __MAC_NA
+#define __MAC_NA    0
+#endif
+
 QT_FORWARD_DECLARE_CLASS(QCocoaWindow)
 
 @class QT_MANGLE_NAMESPACE(QNSWindowHelper);
@@ -98,7 +102,7 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSWindowHelper);
 }
 
 @property (nonatomic, readonly) QNSWindowHelper *helper;
-#if QT_MAC_DEPLOYMENT_TARGET_BELOW(__MAC_10_10, __IPHONE_NA)
+#if QT_MACOS_DEPLOYMENT_TARGET_BELOW(__MAC_10_10)
 // stubs for a 10.10+ property
 @property BOOL titlebarAppearsTransparent;
 #endif

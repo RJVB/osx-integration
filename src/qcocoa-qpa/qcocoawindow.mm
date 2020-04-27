@@ -251,7 +251,7 @@ static void qt_closePopups()
 @implementation QNSWindow
 
 @synthesize helper = _helper;
-#if QT_MAC_DEPLOYMENT_TARGET_BELOW(__MAC_10_10, __IPHONE_NA)
+#if QT_MACOS_DEPLOYMENT_TARGET_BELOW(__MAC_10_10)
 // stubs for a 10.10+ property
 @synthesize titlebarAppearsTransparent = _titlebarAppearsTransparent;
 #endif
