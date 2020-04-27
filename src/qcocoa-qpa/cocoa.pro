@@ -70,6 +70,63 @@ qtConfig(opengl.*) {
     HEADERS += qcocoaglcontext.h
 }
 
+qtConfig(freetype): QMAKE_USE_PRIVATE += freetype
+
+RESOURCES += qcocoaresources.qrc
+
+LIBS += -framework AppKit -framework CoreServices -framework Carbon -framework IOKit -framework QuartzCore -framework CoreVideo -framework Metal -framework IOSurface -lcups
+
+QT += \
+    core-private gui-private \
+    clipboard_support-private theme_support-private \
+    fontdatabase_support-private graphics_support-private
+
+qtConfig(vulkan): QT += vulkan_support-private
+
+CONFIG += no_app_extension_api_only
+
+qtHaveModule(widgets) {
+    QT_FOR_CONFIG += widgets
+
+    SOURCES += qpaintengine_mac.mm
+    HEADERS += qpaintengine_mac_p.h
+
+    qtHaveModule(printsupport) {
+        QT += printsupport-private
+        SOURCES += \
+            qprintengine_mac.mm \
+            qcocoaprintersupport.mm \
+            qcocoaprintdevice.mm
+        HEADERS += \
+            qcocoaprintersupport.h \
+            qcocoaprintdevice.h \
+            qprintengine_mac_p.h
+    }
+
+    qtConfig(colordialog) {
+        SOURCES += qcocoacolordialoghelper.mm
+        HEADERS += qcocoacolordialoghelper.h
+    }
+
+    qtConfig(filedialog) {
+        SOURCES += qcocoafiledialoghelper.mm
+        HEADERS += qcocoafiledialoghelper.h
+    }
+
+    qtConfig(fontdialog) {
+        SOURCES += qcocoafontdialoghelper.mm
+        HEADERS += qcocoafontdialoghelper.h
+    }
+
+    QT += widgets-private
+}
+
+OTHER_FILES += cocoa.json
+
+PLUGIN_TYPE = platforms
+PLUGIN_CLASS_NAME = QCocoaIntegrationPlugin
+!equals(TARGET, $$QT_DEFAULT_QPA_PLUGIN): PLUGIN_EXTENDS = -
+load(qt_plugin)
 RESOURCES += qcocoaresources.qrc
 
 LIBS += -framework AppKit -framework Carbon -framework IOKit -lcups
