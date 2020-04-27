@@ -5265,14 +5265,8 @@ int QCommonStyle::styleHint(StyleHint sh, const QStyleOption *opt, const QWidget
         break;
 #endif
     case SH_Widget_Animate:
-#if QT_CONFIG(treeview)
-        if (qobject_cast<const QTreeView*>(widget)) {
-            ret = false;
-        } else
-#endif
-            {
-            ret = true;
-        }
+        // TODO: is it possible to get a setting from the system?
+        ret = false;
         break;
     case SH_Splitter_OpaqueResize:
         ret = true;
