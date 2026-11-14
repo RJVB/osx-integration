@@ -1948,6 +1948,7 @@ QCocoaNSWindow *QCocoaWindow::createNSWindow(bool shouldBeChildNSWindow, bool sh
 
     if (qEnvironmentVariableIsSet("QT_SURFACEFORMAT_SRGB") && qgetenv("QT_SURFACEFORMAT_SRGB") != "0") {
         window.colorSpace = NSColorSpace.sRGBColorSpace;
+//         NSLog(@"Window %@ will be using the sRGB colour space", window);
     }
 
     return window;
