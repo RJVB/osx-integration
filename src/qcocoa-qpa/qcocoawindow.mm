@@ -1946,6 +1946,10 @@ QCocoaNSWindow *QCocoaWindow::createNSWindow(bool shouldBeChildNSWindow, bool sh
         [window setDepthLimit:NSWindowDepthTwentyfourBitRGB];
     }
 
+    if (qEnvironmentVariableIsSet("QT_SURFACEFORMAT_SRGB") && qgetenv("QT_SURFACEFORMAT_SRGB") != "0") {
+        window.colorSpace = NSColorSpace.sRGBColorSpace;
+    }
+
     return window;
 }
 
