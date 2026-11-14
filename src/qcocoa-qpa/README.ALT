@@ -1,3 +1,9 @@
+20261114 : sRGBColorSpace "support"
+Changes:
+commit ab39da6bd908137e3cbd4348a99a79864c08cad6
+    qAltCocoa QPA: crude backport of (the platform aspects of) QSurfaceFormat::sRGBColorSpace support
+diff --git a/src/qcocoa-qpa/qcocoawindow.mm b/src/qcocoa-qpa/qcocoawindow.mm
+
 20181205 : upstream head (5.9): 7b42fbebbae35a1037d23b58a41bea35dd448f53 (v5.9.7-17-g7b42fbebba)
 Changes:
 commit b11c5a6e5492ce25b8844550ff1a0dc233b61721

@@ -35,6 +35,8 @@ a Qt patch (or a dedicated event handler) to do anything useful though.
   native file dialogs.
 - QT_MAC_FONTENGINE : pre-selects the font engine to be used: CoreText, FontConfig
   or FreeType.
+- QT_SURFACE_SRGB : set to non-0 to emulate the effect of calling the 5.10+ method
+  QSurfaceFormat::setColorSpace(QSurfaceFormat::sRGBColorSpace) .
 
 This component should still build against Qt 5.5.x; the other components need at
 least Qt 5.8 .
