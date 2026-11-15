@@ -42,11 +42,46 @@
 #include "qcocoawindow.h"
 #include "qcocoahelpers.h"
 
+#include <QtCore/qmath.h>
+
 QT_BEGIN_NAMESPACE
 
 QCocoaBackingStore::QCocoaBackingStore(QWindow *window)
     : QRasterBackingStore(window)
 {
+    // RJVB: backport from Qt 5.12.12, replacing the hardcoded limit set in QCocoaWindow::createNSWindow().
+    // Choose an appropriate window depth based on the requested surface format.
+    // On deep colour displays the default bit depth is 16-bit, so unless we need
+    // that level of precision we opt out of it (and the expensive RGB32 -> RGB64
+    // conversions that come with it if our backingstore depth does not match).
+
+    NSWindow *nsWindow = static_cast<QCocoaWindow *>(window->handle())->view().window;
+    auto colorSpaceName = NSColorSpaceFromDepth(nsWindow.depthLimit);
+
+    static const int kDefaultBitDepth = 8;
+    auto surfaceFormat = window->requestedFormat();
+    auto bitsPerSample = qMax(kDefaultBitDepth, qMax(surfaceFormat.redBufferSize(),
+        qMax(surfaceFormat.greenBufferSize(), surfaceFormat.blueBufferSize())));
+
+    // NSBestDepth does not seem to guarantee a window depth deep enough for the
+    // given bits per sample, even if documented as such. For example, requesting
+    // 10 bits per sample will not give us a 16-bit format, even if that's what's
+    // available. Work around this by manually bumping the bit depth.
+    bitsPerSample = !(bitsPerSample & (bitsPerSample - 1))
+        ? bitsPerSample : qNextPowerOfTwo(bitsPerSample);
+
+    auto bestDepth = NSBestDepth(colorSpaceName, bitsPerSample, 0, NO, nullptr);
+
+    // Disable dynamic depth limit, otherwise our depth limit will be overwritten
+    // by AppKit if the window moves to a screen with a different depth. We call
+    // this before setting the depth limit, as the call will reset the depth to 0.
+    [nsWindow setDynamicDepthLimit:NO];
+
+    qDebug() << "Using" << NSBitsPerSampleFromDepth(bestDepth)
+        << "bit window depth for" << nsWindow << "with surface format" << surfaceFormat
+        << "in colour space" << colorSpaceName;
+
+    nsWindow.depthLimit = bestDepth;
 }
 
 QCocoaBackingStore::~QCocoaBackingStore()

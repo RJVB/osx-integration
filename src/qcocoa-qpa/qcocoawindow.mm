@@ -1931,20 +1931,21 @@ QCocoaNSWindow *QCocoaWindow::createNSWindow(bool shouldBeChildNSWindow, bool sh
 
     applyContentBorderThickness(window);
 
-    // Prevent CoreGraphics RGB32 -> RGB64 backing store conversions on deep color
-    // displays by forcing 8-bit components, unless a deep color format has been
-    // requested. This conversion uses significant CPU time.
-    QSurface::SurfaceType surfaceType = QPlatformWindow::window()->surfaceType();
-    bool usesCoreGraphics = surfaceType == QSurface::RasterSurface || surfaceType == QSurface::RasterGLSurface;
-    QSurfaceFormat surfaceFormat = QPlatformWindow::window()->format();
-    bool usesDeepColor = surfaceFormat.redBufferSize() > 8 ||
-                         surfaceFormat.greenBufferSize() > 8 ||
-                         surfaceFormat.blueBufferSize() > 8;
-    bool usesLayer = view().layer;
-    if (usesCoreGraphics && !usesDeepColor && !usesLayer) {
-        [window setDynamicDepthLimit:NO];
-        [window setDepthLimit:NSWindowDepthTwentyfourBitRGB];
-    }
+// RJVB: moved to the QCocoaBackingStore ctor, following Qt 5.12 (or even Qt 5.10?)
+//     // Prevent CoreGraphics RGB32 -> RGB64 backing store conversions on deep color
+//     // displays by forcing 8-bit components, unless a deep color format has been
+//     // requested. This conversion uses significant CPU time.
+//     QSurface::SurfaceType surfaceType = QPlatformWindow::window()->surfaceType();
+//     bool usesCoreGraphics = surfaceType == QSurface::RasterSurface || surfaceType == QSurface::RasterGLSurface;
+//     QSurfaceFormat surfaceFormat = QPlatformWindow::window()->format();
+//     bool usesDeepColor = surfaceFormat.redBufferSize() > 8 ||
+//                          surfaceFormat.greenBufferSize() > 8 ||
+//                          surfaceFormat.blueBufferSize() > 8;
+//     bool usesLayer = view().layer;
+//     if (usesCoreGraphics && !usesDeepColor && !usesLayer) {
+//         [window setDynamicDepthLimit:NO];
+//         [window setDepthLimit:NSWindowDepthTwentyfourBitRGB];
+//     }
 
     if (qEnvironmentVariableIsSet("QT_SURFACEFORMAT_SRGB") && qgetenv("QT_SURFACEFORMAT_SRGB") != "0") {
         window.colorSpace = NSColorSpace.sRGBColorSpace;
