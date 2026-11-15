@@ -1,3 +1,10 @@
+20261115 : more flexible setting of the depth limit
+Changes:
+commit 85298d99a16117ce7120a3c869a8f0380a95a32b
+    backport setting the window depth limit in QCocoaBackingStore as done in Qt 5.12
+diff --git a/src/qcocoa-qpa/qcocoabackingstore.mm b/src/qcocoa-qpa/qcocoabackingstore.mm
+diff --git a/src/qcocoa-qpa/qcocoawindow.mm b/src/qcocoa-qpa/qcocoawindow.mm
+
 20261114 : sRGBColorSpace "support"
 Changes:
 commit ab39da6bd908137e3cbd4348a99a79864c08cad6
