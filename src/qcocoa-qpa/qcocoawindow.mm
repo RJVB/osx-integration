@@ -1951,6 +1951,10 @@ QCocoaNSWindow *QCocoaWindow::createNSWindow(bool shouldBeChildNSWindow, bool sh
         window.colorSpace = NSColorSpace.sRGBColorSpace;
 //         NSLog(@"Window %@ will be using the sRGB colour space", window);
     }
+//     else {
+//         window.colorSpace = NSColorSpace.genericRGBColorSpace;
+//         NSLog(@"Window %@ will be using the \"%@\" colour space, with %d components", window, [window colorSpace], [[window colorSpace] numberOfColorComponents]);
+//     }
 
     return window;
 }

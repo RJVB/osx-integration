@@ -57,6 +57,7 @@ QCocoaBackingStore::QCocoaBackingStore(QWindow *window)
 
     NSWindow *nsWindow = static_cast<QCocoaWindow *>(window->handle())->view().window;
     auto colorSpaceName = NSColorSpaceFromDepth(nsWindow.depthLimit);
+    qDebug() << Q_FUNC_INFO << "Colour space for window depthlimit" << nsWindow.depthLimit << ":" << colorSpaceName;
 
     static const int kDefaultBitDepth = 8;
     auto surfaceFormat = window->requestedFormat();
@@ -67,10 +68,11 @@ QCocoaBackingStore::QCocoaBackingStore(QWindow *window)
     // given bits per sample, even if documented as such. For example, requesting
     // 10 bits per sample will not give us a 16-bit format, even if that's what's
     // available. Work around this by manually bumping the bit depth.
-    bitsPerSample = !(bitsPerSample & (bitsPerSample - 1))
+    auto bumpedBitsPerSample = !(bitsPerSample & (bitsPerSample - 1))
         ? bitsPerSample : qNextPowerOfTwo(bitsPerSample);
+    qDebug() << "requested depth" << bitsPerSample << "/ safe depth" << bumpedBitsPerSample;
 
-    auto bestDepth = NSBestDepth(colorSpaceName, bitsPerSample, 0, NO, nullptr);
+    auto bestDepth = NSBestDepth(colorSpaceName, bumpedBitsPerSample, 0, NO, nullptr);
 
     // Disable dynamic depth limit, otherwise our depth limit will be overwritten
     // by AppKit if the window moves to a screen with a different depth. We call
@@ -78,8 +80,7 @@ QCocoaBackingStore::QCocoaBackingStore(QWindow *window)
     [nsWindow setDynamicDepthLimit:NO];
 
     qDebug() << "Using" << NSBitsPerSampleFromDepth(bestDepth)
-        << "bit window depth for" << nsWindow << "with surface format" << surfaceFormat
-        << "in colour space" << colorSpaceName;
+        << "bit window depth for" << nsWindow << "with surface format" << surfaceFormat;
 
     nsWindow.depthLimit = bestDepth;
 }
